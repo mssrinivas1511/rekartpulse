@@ -14,7 +14,209 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_log: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          description: string
+          event_type: string
+          feature_id: string | null
+          id: string
+          operator: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          description: string
+          event_type?: string
+          feature_id?: string | null
+          id?: string
+          operator?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          description?: string
+          event_type?: string
+          feature_id?: string | null
+          id?: string
+          operator?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_log_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_features: {
+        Row: {
+          adoption_percent: number
+          client_id: string
+          enabled: boolean
+          enabled_at: string
+          feature_id: string
+          id: string
+        }
+        Insert: {
+          adoption_percent?: number
+          client_id: string
+          enabled?: boolean
+          enabled_at?: string
+          feature_id: string
+          id?: string
+        }
+        Update: {
+          adoption_percent?: number
+          client_id?: string
+          enabled?: boolean
+          enabled_at?: string
+          feature_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_features_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_features_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          city: string | null
+          created_at: string
+          customers_count: number
+          health_score: number
+          id: string
+          monthly_revenue: number
+          name: string
+          onboarded_at: string
+          owner_name: string | null
+          phone: string | null
+          plan: string
+          status: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          customers_count?: number
+          health_score?: number
+          id?: string
+          monthly_revenue?: number
+          name: string
+          onboarded_at?: string
+          owner_name?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          customers_count?: number
+          health_score?: number
+          id?: string
+          monthly_revenue?: number
+          name?: string
+          onboarded_at?: string
+          owner_name?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      features: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          client_id: string
+          created_at: string
+          end_reason: string | null
+          ended_at: string | null
+          id: string
+          monthly_amount: number
+          plan: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          monthly_amount?: number
+          plan?: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          monthly_amount?: number
+          plan?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

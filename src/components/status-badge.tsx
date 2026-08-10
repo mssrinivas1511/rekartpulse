@@ -1,68 +1,50 @@
 import { cn } from "@/lib/utils";
-import type { ClientStatus, EventType, FeatureStatus, SubscriptionStatus } from "@/lib/types";
 
-const base = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide";
-
-export function ClientStatusBadge({ status, className }: { status: ClientStatus; className?: string }) {
-  const styles: Record<ClientStatus, string> = {
-    active: "bg-highlight text-highlight-foreground",
-    at_risk: "bg-warning text-warning-foreground",
-    churned: "bg-destructive/10 text-destructive",
-  };
-  const labels: Record<ClientStatus, string> = {
-    active: "Active",
-    at_risk: "At Risk",
-    churned: "Churned",
-  };
-  return <span className={cn(base, styles[status], className)}>{labels[status]}</span>;
-}
-
-export function FeatureStatusBadge({ status, className }: { status: FeatureStatus; className?: string }) {
-  const styles: Record<FeatureStatus, string> = {
-    hit: "bg-primary text-primary-foreground",
-    stable: "bg-secondary text-secondary-foreground",
-    declining: "bg-warning text-warning-foreground",
-  };
-  return (
-    <span className={cn(base, styles[status], className)}>
-      {status === "hit" && <span className="size-1.5 rounded-full bg-primary-foreground" />}
-      {status}
-    </span>
-  );
-}
-
-export function SubscriptionStatusBadge({
-  status,
-  className,
-}: {
-  status: SubscriptionStatus;
-  className?: string;
-}) {
-  const styles: Record<SubscriptionStatus, string> = {
-    active: "bg-highlight text-highlight-foreground",
-    paused: "bg-warning text-warning-foreground",
-    stopped: "bg-destructive/10 text-destructive",
-    completed: "bg-muted text-muted-foreground",
-    ended: "bg-destructive/10 text-destructive",
-  };
-  return <span className={cn(base, styles[status], className)}>{status}</span>;
-}
-
-const EVENT_STYLES: Record<EventType, { dot: string; label: string }> = {
-  general: { dot: "bg-muted-foreground", label: "General" },
-  churn: { dot: "bg-destructive", label: "Churn" },
-  payment: { dot: "bg-primary", label: "Payment" },
-  feature: { dot: "bg-chart-2", label: "Feature" },
-  risk: { dot: "bg-chart-3", label: "Risk" },
-  issue: { dot: "bg-chart-4", label: "Issue" },
+const STYLES: Record<string, string> = {
+  // clients
+  active: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  trial: "bg-sky-100 text-sky-800 border-sky-200",
+  paused: "bg-amber-100 text-amber-800 border-amber-200",
+  churned: "bg-rose-100 text-rose-800 border-rose-200",
+  archived: "bg-zinc-200 text-zinc-600 border-zinc-300",
+  // features
+  live: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  in_development: "bg-amber-100 text-amber-800 border-amber-200",
+  planned: "bg-sky-100 text-sky-800 border-sky-200",
+  deprecated: "bg-zinc-200 text-zinc-600 border-zinc-300",
+  // subscriptions
+  stopped: "bg-rose-100 text-rose-800 border-rose-200",
+  completed: "bg-indigo-100 text-indigo-800 border-indigo-200",
+  ended: "bg-orange-100 text-orange-800 border-orange-200",
+  // tickets
+  open: "bg-rose-100 text-rose-800 border-rose-200",
+  in_progress: "bg-amber-100 text-amber-800 border-amber-200",
+  resolved: "bg-emerald-100 text-emerald-800 border-emerald-200",
+  rejected: "bg-zinc-200 text-zinc-600 border-zinc-300",
+  // priorities
+  low: "bg-zinc-100 text-zinc-700 border-zinc-200",
+  medium: "bg-sky-100 text-sky-800 border-sky-200",
+  high: "bg-amber-100 text-amber-800 border-amber-200",
+  urgent: "bg-rose-100 text-rose-800 border-rose-200",
 };
 
-export function EventTypeBadge({ type, className }: { type: EventType; className?: string }) {
-  const style = EVENT_STYLES[type] ?? EVENT_STYLES.general;
+const LABELS: Record<string, string> = {
+  in_development: "In Development",
+  in_progress: "In Progress",
+};
+
+export function StatusBadge({ status, className }: { status: string; className?: string }) {
+  const style = STYLES[status] ?? "bg-zinc-100 text-zinc-700 border-zinc-200";
+  const label = LABELS[status] ?? status.charAt(0).toUpperCase() + status.slice(1);
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground", className)}>
-      <span className={cn("size-1.5 rounded-full", style.dot)} />
-      {style.label}
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+        style,
+        className,
+      )}
+    >
+      {label}
     </span>
   );
 }

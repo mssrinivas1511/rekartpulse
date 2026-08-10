@@ -507,7 +507,10 @@ export async function fetchFeatureDetail(db: Db, id: string): Promise<FeatureDet
   };
 }
 
-export async function fetchTickets(db: Db, filters?: { status?: string; client_id?: string }): Promise<Ticket[]> {
+export async function fetchTickets(
+  db: Db,
+  filters?: { status?: string | undefined; client_id?: string | undefined },
+): Promise<Ticket[]> {
   let query = db.from("tickets").select("*").order("created_at", { ascending: false });
   if (filters?.status && filters.status !== "all") query = query.eq("status", filters.status);
   if (filters?.client_id) query = query.eq("client_id", filters.client_id);

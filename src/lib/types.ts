@@ -206,6 +206,8 @@ export interface AccountManagerWithStats extends AccountManager {
   features_adopted: number;
 }
 
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
 export interface AuditLog {
   id: string;
   entity_type: string;
@@ -213,8 +215,8 @@ export interface AuditLog {
   entity_label: string | null;
   user_name: string;
   action: string;
-  before_value: Record<string, unknown> | null;
-  after_value: Record<string, unknown> | null;
+  before_value: Json;
+  after_value: Json;
   created_at: string;
 }
 

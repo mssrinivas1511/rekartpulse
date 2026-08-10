@@ -1109,6 +1109,7 @@ export async function createTicket(
     .select("id")
     .single();
   throwIf(error);
+  if (!data) throw new Error("Failed to create ticket");
   await audit(db, userId, {
     entity_type: "ticket",
     entity_id: data.id,
@@ -1174,7 +1175,7 @@ export async function updateTicketStatus(
         : input.status === "rejected"
           ? "Rejected"
           : `Status changed: ${before?.status ?? "?"} → ${input.status}`,
-    before: { status: before?.status },
+    before: { status: before?.status ?? null },
     after: { status: input.status },
   });
 }
@@ -1267,6 +1268,7 @@ export async function insertAccountManager(
     .select("id")
     .single();
   throwIf(error);
+  if (!data) throw new Error("Failed to create account manager");
   await audit(db, userId, {
     entity_type: "account_manager",
     entity_id: data.id,

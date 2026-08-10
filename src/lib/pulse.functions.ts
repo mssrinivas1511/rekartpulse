@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   accountManagerInputSchema,
   archiveClientSchema,
+  archiveClient,
   attachmentInputSchema,
   auditFilterSchema,
   clientFeatureSchema,
@@ -33,6 +34,7 @@ import {
   fetchPermissions,
   fetchTicketDetail,
   fetchTickets,
+  featureInputSchema,
   feedbackInputSchema,
   idSchema,
   insertAccountManager,

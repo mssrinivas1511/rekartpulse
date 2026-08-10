@@ -1,0 +1,9 @@
+CREATE POLICY "Authenticated read feature media" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'feature-media');
+CREATE POLICY "Authenticated upload feature media" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'feature-media');
+CREATE POLICY "Authenticated delete feature media" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'feature-media');
+CREATE POLICY "Authenticated read client logos" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'client-logos');
+CREATE POLICY "Authenticated upload client logos" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'client-logos');
+CREATE POLICY "Authenticated delete client logos" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'client-logos');
+CREATE POLICY "Authenticated read ticket attachments" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'ticket-attachments');
+CREATE POLICY "Authenticated upload ticket attachments" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'ticket-attachments');
+CREATE POLICY "Authenticated delete ticket attachments" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'ticket-attachments');

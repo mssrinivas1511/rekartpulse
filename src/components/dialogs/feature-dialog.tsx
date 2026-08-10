@@ -1,142 +1,181 @@
 import { useState, type ReactNode } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { createFeature } from "@/lib/pulse.functions";
-import type { FeatureStatus } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { createFeature, editFeature } from "@/lib/pulse.functions";
+import type { Feature, FeatureStatus } from "@/lib/types";
+import { Field, inputCls, selectCls } from "./fields";
 
 const CATEGORIES = [
-  "Support",
-  "Communication",
-  "Automation",
-  "Marketing",
-  "Engagement",
+  "CRM",
+  "WhatsApp",
   "Operations",
-  "General",
+  "Customer App",
+  "Delivery",
+  "Payments",
+  "Notifications",
+  "Analytics",
+  "Integrations",
+  "Other",
 ];
 
-export function FeatureDialog({ trigger }: { trigger: ReactNode }) {
+const STATUSES: { value: FeatureStatus; label: string }[] = [
+  { value: "planned", label: "Planned" },
+  { value: "in_development", label: "In Development" },
+  { value: "live", label: "Live" },
+  { value: "deprecated", label: "Deprecated" },
+];
+
+export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("General");
-  const [status, setStatus] = useState<FeatureStatus>("stable");
-  const [description, setDescription] = useState("");
+  const [busy, setBusy] = useState(false);
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      createFeature({
-        data: { name: name.trim(), category, status, description: description.trim() || null },
-      }),
-    onSuccess: () => {
-      toast.success("Feature shipped");
-      queryClient.invalidateQueries();
+  const [name, setName] = useState(feature?.name ?? "");
+  const [category, setCategory] = useState(feature?.category ?? "Other");
+  const [status, setStatus] = useState<FeatureStatus>(feature?.status ?? "planned");
+  const [description, setDescription] = useState(feature?.description ?? "");
+  const [icon, setIcon] = useState(feature?.icon ?? "");
+  const [repositoryUrl, setRepositoryUrl] = useState(feature?.repository_url ?? "");
+  const [expectedAt, setExpectedAt] = useState(feature?.expected_at ?? "");
+  const [liveAt, setLiveAt] = useState(feature?.live_at ?? "");
+  const [betaReady, setBetaReady] = useState(feature?.beta_ready ?? false);
+
+  async function submit() {
+    if (!name.trim()) {
+      toast.error("Feature name is required");
+      return;
+    }
+    setBusy(true);
+    try {
+      const payload = {
+        name: name.trim(),
+        category,
+        status,
+        description: description.trim() || null,
+        icon: icon.trim() || null,
+        repository_url: repositoryUrl.trim() || null,
+        expected_at: expectedAt || null,
+        live_at: liveAt || null,
+        beta_ready: betaReady,
+      };
+      if (feature) {
+        await editFeature({ data: { id: feature.id, ...payload } });
+        toast.success("Feature updated");
+      } else {
+        await createFeature({ data: payload });
+        toast.success("Feature created");
+      }
+      await queryClient.invalidateQueries();
       setOpen(false);
-    },
-    onError: (error) => toast.error(error.message),
-  });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (next) {
-          setName("");
-          setCategory("General");
-          setStatus("stable");
-          setDescription("");
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Ship a new feature</DialogTitle>
-          <DialogDescription>Iteration release — add it to the adoption tracker.</DialogDescription>
+          <DialogTitle>{feature ? "Edit Feature" : "New Feature"}</DialogTitle>
         </DialogHeader>
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            mutation.mutate();
-          }}
-        >
-          <div className="space-y-1.5">
-            <Label htmlFor="feature-name">Feature name</Label>
-            <Input
-              id="feature-name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Push Notifications with Images"
-            />
-          </div>
+        <div className="grid gap-4 py-2">
+          <Field label="Feature Name *">
+            <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
+          </Field>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Category</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as FeatureStatus)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hit">Hit</SelectItem>
-                  <SelectItem value="stable">Stable</SelectItem>
-                  <SelectItem value="declining">Declining</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Field label="Category">
+              <select className={selectCls} value={category} onChange={(e) => setCategory(e.target.value)}>
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Status">
+              <select
+                className={selectCls}
+                value={status}
+                onChange={(e) => setStatus(e.target.value as FeatureStatus)}
+              >
+                {STATUSES.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="feature-description">Description</Label>
-            <Textarea
-              id="feature-description"
+          <Field label="Description">
+            <textarea
+              className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What does it do for clients?"
-              rows={3}
             />
+          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Icon name (lucide)">
+              <input className={inputCls} value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="puzzle" />
+            </Field>
+            <Field label="Repository URL">
+              <input
+                className={inputCls}
+                value={repositoryUrl}
+                onChange={(e) => setRepositoryUrl(e.target.value)}
+                placeholder="https://…"
+              />
+            </Field>
           </div>
-          <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Saving…" : "Add feature"}
-            </Button>
-          </DialogFooter>
-        </form>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Expected Live Date">
+              <input
+                type="date"
+                className={inputCls}
+                value={expectedAt}
+                onChange={(e) => setExpectedAt(e.target.value)}
+              />
+            </Field>
+            <Field label="Actual Live Date">
+              <input
+                type="date"
+                className={inputCls}
+                value={liveAt}
+                onChange={(e) => setLiveAt(e.target.value)}
+              />
+            </Field>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-foreground">
+            <input
+              type="checkbox"
+              checked={betaReady}
+              onChange={(e) => setBetaReady(e.target.checked)}
+              className="size-4 rounded border-input"
+            />
+            Ready for beta
+          </label>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
+            Cancel
+          </Button>
+          <Button onClick={() => void submit()} disabled={busy}>
+            {busy && <Loader2 className="mr-1.5 size-3.5 animate-spin" />}
+            {feature ? "Save Changes" : "Create Feature"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

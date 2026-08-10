@@ -607,10 +607,10 @@ export async function fetchPermissions(db: Db, userId: string) {
   for (const p of rolePerms ?? []) {
     if (!roleIds.has(p.role_id)) continue;
     const existing = perms[p.section] ?? { view: false, create: false, edit: false, delete: false };
-    existing.view = existing.view || p.can_view;
-    existing.create = existing.create || p.can_create;
-    existing.edit = existing.edit || p.can_edit;
-    existing.delete = existing.delete || p.can_delete;
+    existing["view"] = existing["view"] || p.can_view;
+    existing["create"] = existing["create"] || p.can_create;
+    existing["edit"] = existing["edit"] || p.can_edit;
+    existing["delete"] = existing["delete"] || p.can_delete;
     perms[p.section] = existing;
   }
   return { isAdmin: isAdmin === true, permissions: perms };
@@ -642,12 +642,13 @@ export async function insertClient(
       customers_count: input.customers_count,
       health_score: input.health_score,
       account_manager_id: input.account_manager_id || null,
-      client_since: input.client_since || undefined,
+      ...(input.client_since ? { client_since: input.client_since } : {}),
       notes: input.notes || null,
     })
     .select("id")
     .single();
   throwIf(error);
+  if (!data) throw new Error("Failed to create client");
   await audit(db, userId, {
     entity_type: "client",
     entity_id: data.id,
@@ -734,6 +735,7 @@ export async function insertFeature(
     .select("id")
     .single();
   throwIf(error);
+  if (!data) throw new Error("Failed to create feature");
   await audit(db, userId, {
     entity_type: "feature",
     entity_id: data.id,

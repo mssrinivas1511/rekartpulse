@@ -217,8 +217,13 @@ async function signPaths(db: Db, bucket: string, paths: string[]): Promise<Map<s
   if (internal.length === 0) return map;
   const { data, error } = await db.storage.from(bucket).createSignedUrls(internal, 3600);
   if (!error && data) {
+    const base = process.env["SUPABASE_URL"] ?? "";
     for (const row of data) {
-      if (row.path && row.signedUrl) map.set(row.path, row.signedUrl);
+      if (row.path && row.signedUrl) {
+        const url =
+          row.signedUrl.startsWith("/") && base ? `${base}${row.signedUrl}` : row.signedUrl;
+        map.set(row.path, url);
+      }
     }
   }
   return map;
@@ -350,7 +355,7 @@ export async function fetchDashboard(db: Db): Promise<DashboardData> {
   const clientNames = new Map(clients.map((c) => [c.id, c.name]));
   const featureNames = new Map(features.map((f) => [f.id, f.name]));
 
-  const { data: openTickets } = await db
+  const { count: openTicketCount } = await db
     .from("tickets")
     .select("id", { count: "exact", head: true })
     .in("status", ["open", "in_progress", "need_info"]);

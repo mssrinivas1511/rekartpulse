@@ -1,38 +1,65 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   Users,
   Puzzle,
   RefreshCcw,
+  TicketCheck,
+  UserCog,
   ScrollText,
+  Settings,
   Search,
   Menu,
   X,
   Plus,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { getClients } from "@/lib/pulse.functions";
+import { getMyProfile } from "@/lib/auth.functions";
+import { usePermissions } from "@/hooks/use-permissions";
 import { ClientDialog } from "@/components/dialogs/client-dialog";
+import type { Section } from "@/lib/types";
 
-const NAV = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/clients", label: "Clients", icon: Users, exact: false },
-  { to: "/features", label: "Features", icon: Puzzle, exact: false },
-  { to: "/subscriptions", label: "Subscriptions", icon: RefreshCcw, exact: false },
-  { to: "/activity", label: "Activity Log", icon: ScrollText, exact: false },
-] as const;
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  section: Section | null;
+  extraPrefixes?: string[];
+};
+
+const NAV: NavItem[] = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, section: "dashboard" },
+  { to: "/clients", label: "Clients", icon: Users, section: "clients", extraPrefixes: ["/client/"] },
+  { to: "/features", label: "Features", icon: Puzzle, section: "features", extraPrefixes: ["/feature/"] },
+  { to: "/subscriptions", label: "Subscriptions", icon: RefreshCcw, section: "clients" },
+  { to: "/tickets", label: "Tickets", icon: TicketCheck, section: "tickets", extraPrefixes: ["/ticket/"] },
+  { to: "/account-managers", label: "Account Managers", icon: UserCog, section: "account_managers" },
+  { to: "/activity", label: "Activity Log", icon: ScrollText, section: null },
+  { to: "/settings", label: "Settings", icon: Settings, section: "settings" },
+];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const { isAdmin, can, loaded } = usePermissions();
 
   const { data: clients } = useQuery({
     queryKey: ["clients"],
     queryFn: () => getClients({ data: {} }),
     staleTime: 30_000,
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ["my-profile"],
+    queryFn: () => getMyProfile(),
+    staleTime: 60_000,
   });
 
   const results =
@@ -41,6 +68,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           .filter((c) => c.name.toLowerCase().includes(search.trim().toLowerCase()))
           .slice(0, 6)
       : [];
+
+  const visibleNav = NAV.filter(
+    (item) => !loaded || item.section === null || isAdmin || can(item.section, "view"),
+  );
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -73,7 +111,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={() => {
                   setSearch("");
                   onNavigate?.();
-                  navigate({ to: "/clients/$clientId", params: { clientId: client.id } });
+                  navigate({ to: "/client/$clientId", params: { clientId: client.id } });
                 }}
               >
                 <span className="font-medium">{client.name}</span>
@@ -84,24 +122,27 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </div>
 
-      <div className="px-4 pb-3">
-        <ClientDialog
-          trigger={
-            <button className="flex h-9 w-full items-center justify-center gap-1.5 rounded-md bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground transition-colors hover:bg-sidebar-primary/90">
-              <Plus className="size-3.5" /> New Client
-            </button>
-          }
-        />
-      </div>
+      {(!loaded || isAdmin || can("clients", "create")) && (
+        <div className="px-4 pb-3">
+          <ClientDialog
+            trigger={
+              <button className="flex h-9 w-full items-center justify-center gap-1.5 rounded-md bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground transition-colors hover:bg-sidebar-primary/90">
+                <Plus className="size-3.5" /> New Client
+              </button>
+            }
+          />
+        </div>
+      )}
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
         <p className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
           Menu
         </p>
-        {NAV.map((item) => {
-          const active = item.exact
-            ? pathname === item.to
-            : pathname === item.to || pathname.startsWith(`${item.to}/`);
+        {visibleNav.map((item) => {
+          const active =
+            pathname === item.to ||
+            pathname.startsWith(`${item.to}/`) ||
+            (item.extraPrefixes ?? []).some((p) => pathname.startsWith(p));
           return (
             <Link
               key={item.to}
@@ -121,9 +162,28 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border px-5 py-3 text-[11px] leading-relaxed text-sidebar-foreground/50">
-        <p>User: Pappu Singh</p>
-        <p>Version: 1.0.0</p>
+      <div className="border-t border-sidebar-border px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-bold text-sidebar-primary-foreground">
+            {(profile?.full_name ?? "T").charAt(0).toUpperCase()}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-semibold text-sidebar-primary-foreground">
+              {profile?.full_name ?? "Team member"}
+            </p>
+            <p className="truncate text-[10px] text-sidebar-foreground/50">
+              {isAdmin ? "Admin" : (profile?.country ?? "")}
+            </p>
+          </div>
+          <button
+            onClick={() => void handleSignOut()}
+            className="rounded-md p-1.5 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary-foreground"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

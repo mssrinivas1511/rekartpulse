@@ -18,7 +18,7 @@ import {
   getClientDetail,
   setClientArchived,
   setClientFeature,
-  deleteSubscription,
+  removeSubscription,
 } from "@/lib/pulse.functions";
 import type { ClientDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -64,7 +64,7 @@ function ClientDetailPage() {
 
   if (!detail) return null;
   const { client } = detail;
-  const archived = client.status === "archived";
+  const archived = Boolean(client.archived_at);
 
   async function toggleArchive() {
     try {
@@ -91,6 +91,7 @@ function ClientDetailPage() {
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-foreground">{client.name}</h1>
               <StatusBadge status={client.status} />
+              {archived && <StatusBadge status="archived" />}
             </div>
             <p className="text-sm text-muted-foreground">
               {[client.city, client.country].filter(Boolean).join(", ") || "Location not set"} ·{" "}
@@ -100,32 +101,36 @@ function ClientDetailPage() {
         </div>
         <div className="flex items-center gap-2">
           {can("clients", "edit") && (
-            <ClientDialog
-              client={client}
-              trigger={
-                <button className="flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-accent">
-                  <Pencil className="size-3.5" /> Edit
-                </button>
-              }
-            />
-          )}
-          {can("clients", "edit") && (
-            <ConfirmDialog
-              title={archived ? "Restore client?" : "Archive client?"}
-              description={
-                archived
-                  ? `${client.name} will appear in active lists again.`
-                  : `${client.name} will be hidden from active lists. History is kept.`
-              }
-              confirmLabel={archived ? "Restore" : "Archive"}
-              onConfirm={toggleArchive}
-              trigger={
-                <button className="flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-accent">
-                  {archived ? <ArchiveRestore className="size-3.5" /> : <Archive className="size-3.5" />}
-                  {archived ? "Restore" : "Archive"}
-                </button>
-              }
-            />
+            <>
+              <ClientDialog
+                client={client}
+                trigger={
+                  <button className="flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-accent">
+                    <Pencil className="size-3.5" /> Edit
+                  </button>
+                }
+              />
+              <ConfirmDialog
+                title={archived ? "Restore client?" : "Archive client?"}
+                description={
+                  archived
+                    ? `${client.name} will appear in active lists again.`
+                    : `${client.name} will be hidden from active lists. History is kept.`
+                }
+                confirmLabel={archived ? "Restore" : "Archive"}
+                onConfirm={toggleArchive}
+                trigger={
+                  <button className="flex h-8 items-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium text-foreground hover:bg-accent">
+                    {archived ? (
+                      <ArchiveRestore className="size-3.5" />
+                    ) : (
+                      <Archive className="size-3.5" />
+                    )}
+                    {archived ? "Restore" : "Archive"}
+                  </button>
+                }
+              />
+            </>
           )}
         </div>
       </div>
@@ -175,15 +180,15 @@ function OverviewTab({ detail }: { detail: ClientDetail }) {
         <h2 className="mb-3 text-sm font-semibold text-foreground">Details</h2>
         <div className="grid grid-cols-2 gap-4">
           <InfoItem label="Owner" value={client.owner_name} />
-          <InfoItem label="Email" value={client.owner_email} />
-          <InfoItem
-            label="Phone"
-            value={client.owner_phone ? `${client.owner_dial_code} ${client.owner_phone}` : null}
-          />
-          <InfoItem label="Timezone" value={client.timezone} />
-          <InfoItem label="Account Manager" value={client.account_manager_name} />
+          <InfoItem label="Phone" value={client.phone} />
+          <InfoItem label="Industry" value={client.industry} />
+          <InfoItem label="Currency" value={client.currency} />
           <InfoItem label="Customers" value={client.customers_count} />
-          <InfoItem label="Monthly Revenue" value={`₹${client.monthly_revenue.toLocaleString("en-IN")}`} />
+          <InfoItem
+            label="Monthly Revenue"
+            value={`₹${client.monthly_revenue.toLocaleString("en-IN")}`}
+          />
+          <InfoItem label="Client Since" value={format(new Date(client.client_since), "d MMM yyyy")} />
           <InfoItem label="Onboarded" value={format(new Date(client.onboarded_at), "d MMM yyyy")} />
         </div>
       </div>
@@ -200,22 +205,19 @@ function OverviewTab({ detail }: { detail: ClientDetail }) {
 function FeaturesTab({ detail, clientId }: { detail: ClientDetail; clientId: string }) {
   const { can } = usePermissions();
   const queryClient = useQueryClient();
+  const editable = can("clients", "edit");
 
-  async function toggle(featureId: string, enabled: boolean) {
+  const cfMap = new Map(detail.client_features.map((cf) => [cf.feature_id, cf]));
+
+  async function save(featureId: string, enabled: boolean, adoption: number) {
     try {
       await setClientFeature({
-        data: { client_id: clientId, feature_id: featureId, is_enabled: enabled },
-      });
-      await queryClient.invalidateQueries();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Something went wrong");
-    }
-  }
-
-  async function adopt(featureId: string, pct: number) {
-    try {
-      await setClientFeature({
-        data: { client_id: clientId, feature_id: featureId, is_enabled: true, adoption_percent: pct },
+        data: {
+          client_id: clientId,
+          feature_id: featureId,
+          enabled,
+          adoption_percent: adoption,
+        },
       });
       await queryClient.invalidateQueries();
     } catch (e) {
@@ -236,56 +238,69 @@ function FeaturesTab({ detail, clientId }: { detail: ClientDetail; clientId: str
           </tr>
         </thead>
         <tbody>
-          {detail.features.map((f) => (
-            <tr key={f.feature_id} className="border-b border-border/60 last:border-0">
-              <td className="px-4 py-2.5">
-                <Link
-                  to="/feature/$featureId"
-                  params={{ featureId: f.feature_id }}
-                  className="font-medium text-foreground hover:underline"
-                >
-                  {f.feature_name}
-                </Link>
-                <span className="ml-2 text-xs text-muted-foreground">{f.category}</span>
-              </td>
-              <td className="px-4 py-2.5">
-                <StatusBadge status={f.feature_status} />
-              </td>
-              <td className="px-4 py-2.5">
-                <input
-                  type="checkbox"
-                  checked={f.is_enabled}
-                  disabled={!can("clients", "edit")}
-                  onChange={(e) => void toggle(f.feature_id, e.target.checked)}
-                  className="size-4 rounded border-input accent-[var(--primary)]"
-                />
-              </td>
-              <td className="px-4 py-2.5">
-                {f.is_enabled ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      defaultValue={f.adoption_percent}
-                      disabled={!can("clients", "edit")}
-                      onMouseUp={(e) => void adopt(f.feature_id, Number(e.currentTarget.value))}
-                      onTouchEnd={(e) => void adopt(f.feature_id, Number(e.currentTarget.value))}
-                      className="w-28 accent-[var(--primary)]"
-                    />
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {f.adoption_percent}%
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
-                )}
-              </td>
-              <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
-                {f.is_enabled ? f.customers_using : "—"}
+          {detail.features.map((f) => {
+            const cf = cfMap.get(f.id);
+            const enabled = cf?.enabled ?? false;
+            const adoption = cf?.adoption_percent ?? 0;
+            const customersUsing = enabled
+              ? Math.round((adoption / 100) * detail.client.customers_count)
+              : 0;
+            return (
+              <tr key={f.id} className="border-b border-border/60 last:border-0">
+                <td className="px-4 py-2.5">
+                  <Link
+                    to="/feature/$featureId"
+                    params={{ featureId: f.id }}
+                    className="font-medium text-foreground hover:underline"
+                  >
+                    {f.name}
+                  </Link>
+                  <span className="ml-2 text-xs text-muted-foreground">{f.category}</span>
+                </td>
+                <td className="px-4 py-2.5">
+                  <StatusBadge status={f.status} />
+                </td>
+                <td className="px-4 py-2.5">
+                  <input
+                    type="checkbox"
+                    checked={enabled}
+                    disabled={!editable}
+                    onChange={(e) => void save(f.id, e.target.checked, adoption)}
+                    className="size-4 rounded border-input accent-[var(--primary)]"
+                  />
+                </td>
+                <td className="px-4 py-2.5">
+                  {enabled ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        defaultValue={adoption}
+                        disabled={!editable}
+                        onMouseUp={(e) => void save(f.id, true, Number(e.currentTarget.value))}
+                        onTouchEnd={(e) => void save(f.id, true, Number(e.currentTarget.value))}
+                        className="w-28 accent-[var(--primary)]"
+                      />
+                      <span className="text-xs tabular-nums text-muted-foreground">{adoption}%</span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                  {enabled ? customersUsing : "—"}
+                </td>
+              </tr>
+            );
+          })}
+          {detail.features.length === 0 && (
+            <tr>
+              <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                No features defined yet. Add features from the Features page.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
@@ -298,7 +313,7 @@ function SubscriptionsTab({ detail, clientId }: { detail: ClientDetail; clientId
 
   async function remove(id: string) {
     try {
-      await deleteSubscription({ data: { id } });
+      await removeSubscription({ data: { id } });
       toast.success("Subscription deleted");
       await queryClient.invalidateQueries();
     } catch (e) {
@@ -308,7 +323,7 @@ function SubscriptionsTab({ detail, clientId }: { detail: ClientDetail; clientId
 
   return (
     <div className="space-y-3">
-      {can("subscriptions", "create") && (
+      {can("clients", "create") && (
         <div className="flex justify-end">
           <NewSubscriptionDialog
             clientId={clientId}
@@ -356,7 +371,7 @@ function SubscriptionsTab({ detail, clientId }: { detail: ClientDetail; clientId
                 </td>
                 <td className="px-4 py-2.5">
                   <div className="flex items-center justify-end gap-1.5">
-                    {can("subscriptions", "edit") && (
+                    {can("clients", "edit") && (
                       <>
                         <SubscriptionStatusDialog
                           subscription={s}
@@ -376,7 +391,7 @@ function SubscriptionsTab({ detail, clientId }: { detail: ClientDetail; clientId
                         />
                       </>
                     )}
-                    {can("subscriptions", "delete") && (
+                    {can("clients", "delete") && (
                       <ConfirmDialog
                         title="Delete subscription?"
                         description="This permanently removes the record."
@@ -432,7 +447,7 @@ function TicketsTab({ detail }: { detail: ClientDetail }) {
                 </Link>
                 <span className="ml-2 text-xs text-muted-foreground">{t.feature_name ?? ""}</span>
               </td>
-              <td className="px-4 py-2.5 text-muted-foreground">{t.type}</td>
+              <td className="px-4 py-2.5 text-muted-foreground">{t.ticket_type}</td>
               <td className="px-4 py-2.5">
                 <StatusBadge status={t.priority} />
               </td>
@@ -460,22 +475,19 @@ function TicketsTab({ detail }: { detail: ClientDetail }) {
 function ActivityTab({ detail }: { detail: ClientDetail }) {
   return (
     <div className="rounded-lg border border-border bg-card">
-      {detail.activity.map((a) => (
+      {detail.audit.map((a) => (
         <div
           key={a.id}
           className="flex items-start justify-between gap-4 border-b border-border/60 px-4 py-3 last:border-0"
         >
-          <div>
-            <p className="text-sm font-medium text-foreground">{a.action}</p>
-            {a.details && <p className="mt-0.5 text-xs text-muted-foreground">{a.details}</p>}
-          </div>
+          <p className="text-sm font-medium text-foreground">{a.action}</p>
           <div className="shrink-0 text-right text-xs text-muted-foreground">
-            <p>{a.user_name ?? "System"}</p>
+            <p>{a.user_name}</p>
             <p>{formatDateTime(a.created_at)}</p>
           </div>
         </div>
       ))}
-      {detail.activity.length === 0 && (
+      {detail.audit.length === 0 && (
         <p className="px-4 py-8 text-center text-sm text-muted-foreground">No activity yet.</p>
       )}
     </div>

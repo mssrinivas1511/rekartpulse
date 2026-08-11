@@ -13,7 +13,7 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { usePermissions } from "@/hooks/use-permissions";
-import { deleteSubscription, getSubscriptions } from "@/lib/pulse.functions";
+import { removeSubscription, getSubscriptions } from "@/lib/pulse.functions";
 
 export const Route = createFileRoute("/_authenticated/subscriptions")({
   head: () => ({
@@ -45,7 +45,7 @@ function SubscriptionsPage() {
 
   async function remove(id: string) {
     try {
-      await deleteSubscription({ data: { id } });
+      await removeSubscription({ data: { id } });
       toast.success("Subscription deleted");
       await queryClient.invalidateQueries();
     } catch (e) {
@@ -54,20 +54,24 @@ function SubscriptionsPage() {
   }
 
   return (
-    <div className="space-y-4 p-6">
-      <PageHeader title="Subscriptions" description={`${filtered.length} records`}>
-        {can("subscriptions", "create") && (
-          <NewSubscriptionDialog
-            trigger={
-              <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
-                <Plus className="size-3.5" /> Record Subscription
-              </button>
-            }
-          />
-        )}
-      </PageHeader>
+    <div className="space-y-4">
+      <PageHeader
+        title="Subscriptions"
+        description={`${filtered.length} records`}
+        actions={
+          can("clients", "create") ? (
+            <NewSubscriptionDialog
+              trigger={
+                <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
+                  <Plus className="size-3.5" /> Record Subscription
+                </button>
+              }
+            />
+          ) : null
+        }
+      />
 
-      <div className="flex gap-1.5">
+      <div className="flex gap-1.5 px-6">
         {STATUS_FILTERS.map((s) => (
           <button
             key={s}
@@ -83,7 +87,7 @@ function SubscriptionsPage() {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <div className="mx-6 overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -125,7 +129,7 @@ function SubscriptionsPage() {
                 </td>
                 <td className="px-4 py-2.5">
                   <div className="flex items-center justify-end gap-1.5">
-                    {can("subscriptions", "edit") && (
+                    {can("clients", "edit") && (
                       <>
                         <SubscriptionStatusDialog
                           subscription={s}
@@ -145,7 +149,7 @@ function SubscriptionsPage() {
                         />
                       </>
                     )}
-                    {can("subscriptions", "delete") && (
+                    {can("clients", "delete") && (
                       <ConfirmDialog
                         title="Delete subscription?"
                         description="This permanently removes the record."

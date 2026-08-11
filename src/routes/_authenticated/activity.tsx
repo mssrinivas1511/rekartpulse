@@ -55,13 +55,12 @@ function ActivityPage() {
           >
             <div>
               <p className="text-sm font-medium text-foreground">{a.action}</p>
-              {a.details && <p className="mt-0.5 text-xs text-muted-foreground">{a.details}</p>}
               <p className="mt-0.5 text-[11px] uppercase tracking-wide text-muted-foreground/70">
                 {a.entity_label ?? a.entity_type}
               </p>
             </div>
             <div className="shrink-0 text-right text-xs text-muted-foreground">
-              <p>{a.user_name ?? "System"}</p>
+              <p>{a.user_name}</p>
               <p>{formatDateTime(a.created_at)}</p>
             </div>
           </div>

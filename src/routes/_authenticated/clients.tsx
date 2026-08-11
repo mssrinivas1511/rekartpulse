@@ -33,24 +33,28 @@ function ClientsPage() {
   const [showArchived, setShowArchived] = useState(false);
 
   const filtered = clients
-    .filter((c) => (showArchived ? true : c.status !== "archived"))
+    .filter((c) => (showArchived ? true : !c.archived_at))
     .filter((c) => !search.trim() || c.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   return (
-    <div className="space-y-4 p-6">
-      <PageHeader title="Clients" description={`${filtered.length} clients`}>
-        {can("clients", "create") && (
-          <ClientDialog
-            trigger={
-              <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
-                <Plus className="size-3.5" /> New Client
-              </button>
-            }
-          />
-        )}
-      </PageHeader>
+    <div className="space-y-4">
+      <PageHeader
+        title="Clients"
+        description={`${filtered.length} clients`}
+        actions={
+          can("clients", "create") ? (
+            <ClientDialog
+              trigger={
+                <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
+                  <Plus className="size-3.5" /> New Client
+                </button>
+              }
+            />
+          ) : null
+        }
+      />
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 px-6">
         <div className="relative w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -71,7 +75,7 @@ function ClientsPage() {
         </label>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <div className="mx-6 overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -79,7 +83,7 @@ function ClientsPage() {
               <th className="px-4 py-2.5">Plan</th>
               <th className="px-4 py-2.5">Status</th>
               <th className="px-4 py-2.5 text-right">Customers</th>
-              <th className="px-4 py-2.5 text-right">Features</th>
+              <th className="px-4 py-2.5 text-right">Features Enabled</th>
               <th className="px-4 py-2.5">Account Manager</th>
               <th className="px-4 py-2.5">Health</th>
             </tr>
@@ -101,7 +105,14 @@ function ClientsPage() {
                       </span>
                     )}
                     <span>
-                      <span className="block font-medium text-foreground">{c.name}</span>
+                      <span className="block font-medium text-foreground">
+                        {c.name}
+                        {c.archived_at && (
+                          <span className="ml-2 text-[11px] font-normal text-muted-foreground">
+                            (archived)
+                          </span>
+                        )}
+                      </span>
                       <span className="block text-xs text-muted-foreground">
                         {[c.city, c.country].filter(Boolean).join(", ") || "—"}
                       </span>
@@ -116,9 +127,11 @@ function ClientsPage() {
                   {c.customers_count}
                 </td>
                 <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
-                  {c.features_using}/{c.features_enabled}
+                  {c.features_enabled}
                 </td>
-                <td className="px-4 py-2.5 text-muted-foreground">{c.account_manager_name ?? "—"}</td>
+                <td className="px-4 py-2.5 text-muted-foreground">
+                  {c.account_manager_name ?? "—"}
+                </td>
                 <td className="px-4 py-2.5">
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">

@@ -9,7 +9,6 @@ import {
   Puzzle,
   TrendingDown,
   Users,
-  Wallet,
 } from "lucide-react";
 import { ChurnChart } from "@/components/churn-chart";
 import { StatusBadge } from "@/components/status-badge";
@@ -57,7 +56,7 @@ function DashboardPage() {
     queryKey: ["dashboard"],
     queryFn: () => getDashboard(),
   });
-  const { kpis, feature_summary: features, recent_feedback: feedback, churn_trend: churn } = data;
+  const { stats, feature_stats: features, recent_feedback: feedback, churn_by_month: churn } = data;
 
   return (
     <div className="space-y-6 p-6">
@@ -72,40 +71,40 @@ function DashboardPage() {
         <Kpi
           icon={Puzzle}
           label="Avg Feature Adoption"
-          value={`${kpis.avg_feature_adoption_rate}%`}
-          sub={`${kpis.customers_using_features} customers using features`}
+          value={`${stats.avg_adoption_rate}%`}
+          sub="across enabled clients"
         />
         <Kpi
           icon={Activity}
           label="Features Live"
-          value={`${kpis.features_live}/${kpis.features_total}`}
-          sub="of tracked features"
+          value={`${stats.features_live}/${stats.total_features}`}
+          sub={`${stats.features_in_development} in development · ${stats.features_planned} planned`}
         />
         <Kpi
           icon={Users}
           label="Active Clients"
-          value={kpis.clients_active}
-          sub={`${kpis.clients_trial} trial · ${kpis.clients_paid} paid · ${kpis.clients_churned} churned`}
+          value={stats.active_clients}
+          sub={`${stats.trial_clients} trial · ${stats.paid_clients} paid · ${stats.churned_clients} churned`}
         />
         <Kpi
           icon={TrendingDown}
           label="Churn Rate"
-          value={`${kpis.churn_rate}%`}
-          sub={`${kpis.trial_to_paid_rate}% trial → paid`}
+          value={`${stats.churn_rate}%`}
+          sub={`${stats.trial_to_paid}% trial → paid`}
         />
-        <Kpi icon={ClipboardList} label="Open Tickets" value={kpis.open_tickets} />
-        <Kpi icon={MessageSquare} label="Feedback Received" value={kpis.feedback_total} />
-        <Kpi
-          icon={Wallet}
-          label="Monthly Revenue"
-          value={`₹${kpis.total_monthly_revenue.toLocaleString("en-IN")}`}
-          sub="context only"
-        />
+        <Kpi icon={ClipboardList} label="Open Tickets" value={stats.open_tickets} />
+        <Kpi icon={MessageSquare} label="Feedback Received" value={stats.total_feedback} />
         <Kpi
           icon={AlertTriangle}
           label="Clients Using Features"
-          value={kpis.clients_using_features}
-          sub={`${kpis.features_enabled} enablements`}
+          value={stats.clients_using_features}
+          sub="at least one feature enabled"
+        />
+        <Kpi
+          icon={Users}
+          label="New This Month"
+          value={stats.new_clients_this_month}
+          sub="clients onboarded"
         />
       </div>
 
@@ -149,9 +148,11 @@ function DashboardPage() {
               {feedback.slice(0, 5).map((fb) => (
                 <div key={fb.id} className="flex items-start justify-between gap-2 text-xs">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-foreground">{fb.feature_name}</p>
+                    <p className="truncate font-medium text-foreground">
+                      {fb.feature_name ?? "Feature"}
+                    </p>
                     <p className="truncate text-muted-foreground">
-                      {fb.client_name} · {format(new Date(fb.created_at), "d MMM")}
+                      {fb.client_name ?? "Internal"} · {format(new Date(fb.created_at), "d MMM")}
                     </p>
                   </div>
                   <StatusBadge status={fb.status} />

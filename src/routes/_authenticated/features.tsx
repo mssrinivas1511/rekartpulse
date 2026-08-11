@@ -5,7 +5,7 @@ import { FeatureDialog } from "@/components/dialogs/feature-dialog";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { usePermissions } from "@/hooks/use-permissions";
-import { getFeatures } from "@/lib/pulse.functions";
+import { getFeatureStats } from "@/lib/pulse.functions";
 
 export const Route = createFileRoute("/_authenticated/features")({
   head: () => ({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/features")({
   loader: ({ context }) =>
     context.queryClient.ensureQueryData({
       queryKey: ["features"],
-      queryFn: () => getFeatures(),
+      queryFn: () => getFeatureStats(),
     }),
   component: FeaturesPage,
 });
@@ -25,25 +25,29 @@ export const Route = createFileRoute("/_authenticated/features")({
 function FeaturesPage() {
   const { data: features } = useSuspenseQuery({
     queryKey: ["features"],
-    queryFn: () => getFeatures(),
+    queryFn: () => getFeatureStats(),
   });
   const { can } = usePermissions();
 
   return (
-    <div className="space-y-4 p-6">
-      <PageHeader title="Features" description={`${features.length} tracked features`}>
-        {can("features", "create") && (
-          <FeatureDialog
-            trigger={
-              <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
-                <Plus className="size-3.5" /> New Feature
-              </button>
-            }
-          />
-        )}
-      </PageHeader>
+    <div className="space-y-4">
+      <PageHeader
+        title="Features"
+        description={`${features.length} tracked features`}
+        actions={
+          can("features", "create") ? (
+            <FeatureDialog
+              trigger={
+                <button className="flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
+                  <Plus className="size-3.5" /> New Feature
+                </button>
+              }
+            />
+          ) : null
+        }
+      />
 
-      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <div className="mx-6 overflow-x-auto rounded-lg border border-border bg-card">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">

@@ -35,7 +35,7 @@ function SubscriptionForm({
   subscription,
   onDone,
 }: {
-  clientId?: string;
+  clientId?: string | undefined;
   subscription?: Subscription;
   onDone: () => void;
 }) {

@@ -4,6 +4,7 @@ const STYLES: Record<string, string> = {
   // clients
   active: "bg-emerald-100 text-emerald-800 border-emerald-200",
   trial: "bg-sky-100 text-sky-800 border-sky-200",
+  paid: "bg-emerald-100 text-emerald-800 border-emerald-200",
   paused: "bg-amber-100 text-amber-800 border-amber-200",
   churned: "bg-rose-100 text-rose-800 border-rose-200",
   archived: "bg-zinc-200 text-zinc-600 border-zinc-300",
@@ -21,16 +22,24 @@ const STYLES: Record<string, string> = {
   in_progress: "bg-amber-100 text-amber-800 border-amber-200",
   resolved: "bg-emerald-100 text-emerald-800 border-emerald-200",
   rejected: "bg-zinc-200 text-zinc-600 border-zinc-300",
+  need_info: "bg-sky-100 text-sky-800 border-sky-200",
   // priorities
   low: "bg-zinc-100 text-zinc-700 border-zinc-200",
   medium: "bg-sky-100 text-sky-800 border-sky-200",
   high: "bg-amber-100 text-amber-800 border-amber-200",
+  critical: "bg-rose-100 text-rose-800 border-rose-200",
   urgent: "bg-rose-100 text-rose-800 border-rose-200",
+  // feedback
+  new: "bg-sky-100 text-sky-800 border-sky-200",
+  in_review: "bg-amber-100 text-amber-800 border-amber-200",
+  done: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
 
 const LABELS: Record<string, string> = {
   in_development: "In Development",
   in_progress: "In Progress",
+  need_info: "Need Info",
+  in_review: "In Review",
 };
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {

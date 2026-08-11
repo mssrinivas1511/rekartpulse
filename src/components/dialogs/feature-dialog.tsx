@@ -15,7 +15,7 @@ import { createFeature, editFeature } from "@/lib/pulse.functions";
 import type { Feature, FeatureStatus } from "@/lib/types";
 import { Field, inputCls, selectCls } from "./fields";
 
-const CATEGORIES = [
+export const FEATURE_CATEGORIES = [
   "CRM",
   "WhatsApp",
   "Operations",
@@ -28,7 +28,7 @@ const CATEGORIES = [
   "Other",
 ];
 
-const STATUSES: { value: FeatureStatus; label: string }[] = [
+export const FEATURE_STATUSES: { value: FeatureStatus; label: string }[] = [
   { value: "planned", label: "Planned" },
   { value: "in_development", label: "In Development" },
   { value: "live", label: "Live" },
@@ -44,11 +44,8 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
   const [category, setCategory] = useState(feature?.category ?? "Other");
   const [status, setStatus] = useState<FeatureStatus>(feature?.status ?? "planned");
   const [description, setDescription] = useState(feature?.description ?? "");
-  const [icon, setIcon] = useState(feature?.icon ?? "");
-  const [repositoryUrl, setRepositoryUrl] = useState(feature?.repository_url ?? "");
-  const [expectedAt, setExpectedAt] = useState(feature?.expected_at ?? "");
-  const [liveAt, setLiveAt] = useState(feature?.live_at ?? "");
-  const [betaReady, setBetaReady] = useState(feature?.beta_ready ?? false);
+  const [releaseVersion, setReleaseVersion] = useState(feature?.release_version ?? "");
+  const [releaseDate, setReleaseDate] = useState(feature?.release_date ?? "");
 
   async function submit() {
     if (!name.trim()) {
@@ -62,11 +59,8 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
         category,
         status,
         description: description.trim() || null,
-        icon: icon.trim() || null,
-        repository_url: repositoryUrl.trim() || null,
-        expected_at: expectedAt || null,
-        live_at: liveAt || null,
-        beta_ready: betaReady,
+        release_version: releaseVersion.trim() || null,
+        release_date: releaseDate || null,
       };
       if (feature) {
         await editFeature({ data: { id: feature.id, ...payload } });
@@ -98,7 +92,7 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
           <div className="grid grid-cols-2 gap-4">
             <Field label="Category">
               <select className={selectCls} value={category} onChange={(e) => setCategory(e.target.value)}>
-                {CATEGORIES.map((c) => (
+                {FEATURE_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
@@ -111,7 +105,7 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
                 value={status}
                 onChange={(e) => setStatus(e.target.value as FeatureStatus)}
               >
-                {STATUSES.map((s) => (
+                {FEATURE_STATUSES.map((s) => (
                   <option key={s.value} value={s.value}>
                     {s.label}
                   </option>
@@ -127,45 +121,23 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
             />
           </Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Icon name (lucide)">
-              <input className={inputCls} value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="puzzle" />
-            </Field>
-            <Field label="Repository URL">
+            <Field label="Release Version">
               <input
                 className={inputCls}
-                value={repositoryUrl}
-                onChange={(e) => setRepositoryUrl(e.target.value)}
-                placeholder="https://…"
+                value={releaseVersion}
+                onChange={(e) => setReleaseVersion(e.target.value)}
+                placeholder="v2.4.0"
               />
             </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Expected Live Date">
+            <Field label="Release Date">
               <input
                 type="date"
                 className={inputCls}
-                value={expectedAt}
-                onChange={(e) => setExpectedAt(e.target.value)}
-              />
-            </Field>
-            <Field label="Actual Live Date">
-              <input
-                type="date"
-                className={inputCls}
-                value={liveAt}
-                onChange={(e) => setLiveAt(e.target.value)}
+                value={releaseDate}
+                onChange={(e) => setReleaseDate(e.target.value)}
               />
             </Field>
           </div>
-          <label className="flex items-center gap-2 text-sm text-foreground">
-            <input
-              type="checkbox"
-              checked={betaReady}
-              onChange={(e) => setBetaReady(e.target.checked)}
-              className="size-4 rounded border-input"
-            />
-            Ready for beta
-          </label>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>

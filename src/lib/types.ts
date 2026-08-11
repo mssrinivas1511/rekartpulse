@@ -57,7 +57,7 @@ export interface RolePermission {
 }
 
 export interface TeamMember extends Profile {
-  email?: string;
+  email?: string | undefined;
   role_ids: string[];
   role_names: string[];
 }

@@ -150,7 +150,7 @@ export const accountManagerInputSchema = z.object({
 export const updateAccountManagerSchema = accountManagerInputSchema.extend({ id: z.string() });
 
 export const auditFilterSchema = z.object({
-  entity_type: z.string(),
+  entity_type: z.string().optional(),
   entity_id: z.string().optional(),
 });
 
@@ -217,8 +217,13 @@ async function signPaths(db: Db, bucket: string, paths: string[]): Promise<Map<s
   if (internal.length === 0) return map;
   const { data, error } = await db.storage.from(bucket).createSignedUrls(internal, 3600);
   if (!error && data) {
+    const base = process.env["SUPABASE_URL"] ?? "";
     for (const row of data) {
-      if (row.path && row.signedUrl) map.set(row.path, row.signedUrl);
+      if (row.path && row.signedUrl) {
+        const url =
+          row.signedUrl.startsWith("/") && base ? `${base}${row.signedUrl}` : row.signedUrl;
+        map.set(row.path, url);
+      }
     }
   }
   return map;
@@ -350,7 +355,7 @@ export async function fetchDashboard(db: Db): Promise<DashboardData> {
   const clientNames = new Map(clients.map((c) => [c.id, c.name]));
   const featureNames = new Map(features.map((f) => [f.id, f.name]));
 
-  const { data: openTickets } = await db
+  const { count: openTicketCount } = await db
     .from("tickets")
     .select("id", { count: "exact", head: true })
     .in("status", ["open", "in_progress", "need_info"]);
@@ -371,7 +376,7 @@ export async function fetchDashboard(db: Db): Promise<DashboardData> {
       churn_rate: churnRate,
       new_clients_this_month: newThisMonth,
       trial_to_paid: trialToPaid,
-      open_tickets: openTickets?.length ?? 0,
+      open_tickets: openTicketCount ?? 0,
     },
     churn_by_month: months.map(({ month, count }) => ({ month, count })),
     feature_stats: featureStats.sort((a, b) => b.adoption_rate - a.adoption_rate),
@@ -586,13 +591,19 @@ export async function fetchAccountManagers(db: Db): Promise<AccountManagerWithSt
   });
 }
 
-export async function fetchAuditLogs(db: Db, entityType: string, entityId?: string): Promise<AuditLog[]> {
+export async function fetchSubscriptions(db: Db): Promise<Subscription[]> {
+  const [subscriptions, clients] = await Promise.all([fetchAllSubscriptions(db), fetchAllClients(db)]);
+  const clientNames = new Map(clients.map((c) => [c.id, c.name]));
+  return subscriptions.map((s) => ({ ...s, client_name: clientNames.get(s.client_id) ?? "Unknown client" }));
+}
+
+export async function fetchAuditLogs(db: Db, entityType?: string, entityId?: string): Promise<AuditLog[]> {
   let query = db
     .from("audit_logs")
     .select("*")
-    .eq("entity_type", entityType)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(200);
+  if (entityType && entityType !== "all") query = query.eq("entity_type", entityType);
   if (entityId) query = query.eq("entity_id", entityId);
   const { data, error } = await query;
   throwIf(error);

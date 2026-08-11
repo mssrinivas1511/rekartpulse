@@ -1,0 +1,13 @@
+{
+  "name": "Rekart Pulse — Client Success Dashboard",
+  "short_name": "Rekart Pulse",
+  "description": "Internal dashboard for the Rekart team: feature adoption, client health, feedback and tickets.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d1f16",
+  "theme_color": "#0d1f16",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon", "purpose": "any" }
+  ]
+}

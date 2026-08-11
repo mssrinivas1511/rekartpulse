@@ -32,6 +32,7 @@ import {
   fetchFeatureDetail,
   fetchFeatureStats,
   fetchPermissions,
+  fetchSubscriptions,
   fetchTicketDetail,
   fetchTickets,
   featureInputSchema,
@@ -106,8 +107,12 @@ export const getAccountManagers = createServerFn({ method: "GET" })
 
 export const getAuditLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => auditFilterSchema.parse(data))
+  .inputValidator((data: unknown) => auditFilterSchema.parse(data ?? {}))
   .handler(({ data, context }) => fetchAuditLogs(context.supabase, data.entity_type, data.entity_id));
+
+export const getSubscriptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(({ context }) => fetchSubscriptions(context.supabase));
 
 export const getMyPermissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

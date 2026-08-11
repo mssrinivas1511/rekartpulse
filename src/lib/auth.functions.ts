@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import { SECTIONS, type Profile, type Role, type RolePermission, type TeamMember } from "./types";
 
-type Db = Parameters<Parameters<ReturnType<typeof createServerFn>["handler"]>[0]>[0] extends never
-  ? never
-  : import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>;
+type Db = SupabaseClient<Database>;
 
 const profileInputSchema = z.object({
   full_name: z.string().min(1),

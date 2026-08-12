@@ -12,12 +12,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAccountManagersRouteImport } from './routes/_authenticated/account-managers'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSubscriptionsRouteImport } from './routes/_authenticated/subscriptions'
+import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedClientClientIdRouteImport } from './routes/_authenticated/client.$clientId'
+import { Route as AuthenticatedFeatureFeatureIdRouteImport } from './routes/_authenticated/feature.$featureId'
+import { Route as AuthenticatedTicketTicketIdRouteImport } from './routes/_authenticated/ticket.$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,6 +38,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountManagersRoute =
+  AuthenticatedAccountManagersRouteImport.update({
+    id: '/account-managers',
+    path: '/account-managers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -53,83 +64,135 @@ const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSubscriptionsRoute =
   AuthenticatedSubscriptionsRouteImport.update({
     id: '/subscriptions',
     path: '/subscriptions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedClientClientIdRoute =
   AuthenticatedClientClientIdRouteImport.update({
     id: '/client/$clientId',
     path: '/client/$clientId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFeatureFeatureIdRoute =
+  AuthenticatedFeatureFeatureIdRouteImport.update({
+    id: '/feature/$featureId',
+    path: '/feature/$featureId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTicketTicketIdRoute =
+  AuthenticatedTicketTicketIdRouteImport.update({
+    id: '/ticket/$ticketId',
+    path: '/ticket/$ticketId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/account-managers': typeof AuthenticatedAccountManagersRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/subscriptions': typeof AuthenticatedSubscriptionsRoute
+  '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
+  '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
+  '/ticket/$ticketId': typeof AuthenticatedTicketTicketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/account-managers': typeof AuthenticatedAccountManagersRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/subscriptions': typeof AuthenticatedSubscriptionsRoute
+  '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
+  '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
+  '/ticket/$ticketId': typeof AuthenticatedTicketTicketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/account-managers': typeof AuthenticatedAccountManagersRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/subscriptions': typeof AuthenticatedSubscriptionsRoute
+  '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/client/$clientId': typeof AuthenticatedClientClientIdRoute
+  '/_authenticated/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
+  '/_authenticated/ticket/$ticketId': typeof AuthenticatedTicketTicketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/account-managers'
     | '/activity'
     | '/clients'
     | '/dashboard'
     | '/features'
+    | '/settings'
     | '/subscriptions'
+    | '/tickets'
     | '/client/$clientId'
+    | '/feature/$featureId'
+    | '/ticket/$ticketId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/account-managers'
     | '/activity'
     | '/clients'
     | '/dashboard'
     | '/features'
+    | '/settings'
     | '/subscriptions'
+    | '/tickets'
     | '/client/$clientId'
+    | '/feature/$featureId'
+    | '/ticket/$ticketId'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/account-managers'
     | '/_authenticated/activity'
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
     | '/_authenticated/features'
+    | '/_authenticated/settings'
     | '/_authenticated/subscriptions'
+    | '/_authenticated/tickets'
     | '/_authenticated/client/$clientId'
+    | '/_authenticated/feature/$featureId'
+    | '/_authenticated/ticket/$ticketId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -161,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account-managers': {
+      id: '/_authenticated/account-managers'
+      path: '/account-managers'
+      fullPath: '/account-managers'
+      preLoaderRoute: typeof AuthenticatedAccountManagersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/activity': {
       id: '/_authenticated/activity'
       path: '/activity'
@@ -189,11 +259,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFeaturesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/subscriptions': {
       id: '/_authenticated/subscriptions'
       path: '/subscriptions'
       fullPath: '/subscriptions'
       preLoaderRoute: typeof AuthenticatedSubscriptionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tickets': {
+      id: '/_authenticated/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof AuthenticatedTicketsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/client/$clientId': {
@@ -203,25 +287,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientClientIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/feature/$featureId': {
+      id: '/_authenticated/feature/$featureId'
+      path: '/feature/$featureId'
+      fullPath: '/feature/$featureId'
+      preLoaderRoute: typeof AuthenticatedFeatureFeatureIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ticket/$ticketId': {
+      id: '/_authenticated/ticket/$ticketId'
+      path: '/ticket/$ticketId'
+      fullPath: '/ticket/$ticketId'
+      preLoaderRoute: typeof AuthenticatedTicketTicketIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountManagersRoute: typeof AuthenticatedAccountManagersRoute
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSubscriptionsRoute: typeof AuthenticatedSubscriptionsRoute
+  AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedClientClientIdRoute: typeof AuthenticatedClientClientIdRoute
+  AuthenticatedFeatureFeatureIdRoute: typeof AuthenticatedFeatureFeatureIdRoute
+  AuthenticatedTicketTicketIdRoute: typeof AuthenticatedTicketTicketIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountManagersRoute: AuthenticatedAccountManagersRoute,
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSubscriptionsRoute: AuthenticatedSubscriptionsRoute,
+  AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedClientClientIdRoute: AuthenticatedClientClientIdRoute,
+  AuthenticatedFeatureFeatureIdRoute: AuthenticatedFeatureFeatureIdRoute,
+  AuthenticatedTicketTicketIdRoute: AuthenticatedTicketTicketIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

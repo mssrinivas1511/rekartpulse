@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/client/$clientId")({
   loader: async ({ params, context }) => {
     const detail = await context.queryClient.ensureQueryData({
       queryKey: ["client", params.clientId],
-      queryFn: () => getClientDetail({ data: { client_id: params.clientId } }),
+      queryFn: () => getClientDetail({ data: { id: params.clientId } }),
     });
     if (!detail) throw notFound();
     return detail;
@@ -56,7 +56,7 @@ function ClientDetailPage() {
   const { clientId } = Route.useParams();
   const { data: detail } = useSuspenseQuery({
     queryKey: ["client", clientId],
-    queryFn: () => getClientDetail({ data: { client_id: clientId } }),
+    queryFn: () => getClientDetail({ data: { id: clientId } }),
   });
   const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
   const { can } = usePermissions();

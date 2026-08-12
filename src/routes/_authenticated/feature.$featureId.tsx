@@ -1,5 +1,5 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,14 +43,14 @@ function FeatureDetailPage() {
   const { featureId } = Route.useParams();
   const { data } = useSuspenseQuery({ queryKey: ["feature", featureId], queryFn: () => getFeatureDetail({ data: { id: featureId } }) });
   const { can } = usePermissions();
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const f = data.feature;
 
   async function remove() {
     try {
       await removeFeature({ data: { id: f.id } });
       toast.success("Feature deleted");
-      window.location.assign("/features");
+      await navigate({ to: "/features" });
     } catch (error) { toast.error(error instanceof Error ? error.message : "Could not delete feature"); }
   }
 

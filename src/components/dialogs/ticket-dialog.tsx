@@ -90,8 +90,14 @@ export function TicketDialog({
   });
 
   function submit() {
-    if (!clientId) return toast.error("Please pick a client");
-    if (!title.trim()) return toast.error("Please add a ticket title");
+    if (!clientId) {
+      toast.error("Please pick a client");
+      return;
+    }
+    if (!title.trim()) {
+      toast.error("Please add a ticket title");
+      return;
+    }
     mutation.mutate();
   }
 

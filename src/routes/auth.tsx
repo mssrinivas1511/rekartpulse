@@ -11,13 +11,11 @@ const inputCls =
   "h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { redirect: string } => {
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
     const redirect = search["redirect"];
-    return {
-      redirect:
-        typeof redirect === "string" && redirect.startsWith("/") ? redirect : "/dashboard",
-    };
+    return typeof redirect === "string" && redirect.startsWith("/") ? { redirect } : {};
   },
+
   head: () => ({
     meta: [
       { title: "Sign in — Rekart Pulse" },

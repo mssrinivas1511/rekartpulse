@@ -204,7 +204,11 @@ export interface AccountManagerWithStats extends AccountManager {
   active_clients: number;
   churned_clients: number;
   features_adopted: number;
+  tickets_assigned: number;
+  tickets_resolved: number;
+  ticket_resolution_rate: number;
 }
+
 
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 

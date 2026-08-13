@@ -19,7 +19,6 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedSubscriptionsRouteImport } from './routes/_authenticated/subscriptions'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedClientClientIdRouteImport } from './routes/_authenticated/client.$clientId'
 import { Route as AuthenticatedFeatureFeatureIdRouteImport } from './routes/_authenticated/feature.$featureId'
@@ -75,12 +74,6 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSubscriptionsRoute =
-  AuthenticatedSubscriptionsRouteImport.update({
-    id: '/subscriptions',
-    path: '/subscriptions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
   id: '/tickets',
   path: '/tickets',
@@ -115,7 +108,6 @@ export interface FileRoutesByFullPath {
   '/features': typeof AuthenticatedFeaturesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -131,7 +123,6 @@ export interface FileRoutesByTo {
   '/features': typeof AuthenticatedFeaturesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -149,7 +140,6 @@ export interface FileRoutesById {
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/_authenticated/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -167,7 +157,6 @@ export interface FileRouteTypes {
     | '/features'
     | '/profile'
     | '/settings'
-    | '/subscriptions'
     | '/tickets'
     | '/client/$clientId'
     | '/feature/$featureId'
@@ -183,7 +172,6 @@ export interface FileRouteTypes {
     | '/features'
     | '/profile'
     | '/settings'
-    | '/subscriptions'
     | '/tickets'
     | '/client/$clientId'
     | '/feature/$featureId'
@@ -200,7 +188,6 @@ export interface FileRouteTypes {
     | '/_authenticated/features'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
-    | '/_authenticated/subscriptions'
     | '/_authenticated/tickets'
     | '/_authenticated/client/$clientId'
     | '/_authenticated/feature/$featureId'
@@ -285,13 +272,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/subscriptions': {
-      id: '/_authenticated/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/subscriptions'
-      preLoaderRoute: typeof AuthenticatedSubscriptionsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/tickets': {
       id: '/_authenticated/tickets'
       path: '/tickets'
@@ -331,7 +311,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedSubscriptionsRoute: typeof AuthenticatedSubscriptionsRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedClientClientIdRoute: typeof AuthenticatedClientClientIdRoute
   AuthenticatedFeatureFeatureIdRoute: typeof AuthenticatedFeatureFeatureIdRoute
@@ -346,7 +325,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedSubscriptionsRoute: AuthenticatedSubscriptionsRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedClientClientIdRoute: AuthenticatedClientClientIdRoute,
   AuthenticatedFeatureFeatureIdRoute: AuthenticatedFeatureFeatureIdRoute,

@@ -77,9 +77,9 @@ function ProfilePage() {
 
   function onCountry(value: string) {
     setCountry(value);
-    const match = COUNTRIES.find((c) => c.name === value);
+    const match = COUNTRIES.find((c) => c.country === value);
     if (match) {
-      setCountryCode(match.dial);
+      setCountryCode(match.dialCode);
       setCurrency(match.currency);
     }
   }
@@ -143,8 +143,8 @@ function ProfilePage() {
                 onChange={(e) => onCountry(e.target.value)}
               >
                 {COUNTRIES.map((c) => (
-                  <option key={c.name} value={c.name}>
-                    {c.name}
+                  <option key={c.country} value={c.country}>
+                    {c.country}
                   </option>
                 ))}
               </select>

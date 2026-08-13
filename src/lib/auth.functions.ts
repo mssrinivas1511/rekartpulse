@@ -23,6 +23,23 @@ const inviteSchema = z.object({
   role_ids: z.array(z.string()).default([]),
 });
 
+const avatarSchema = z.object({ avatar_url: z.string().nullable() });
+
+async function signAvatars(db: Db, paths: string[]): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  const internal = paths.filter((p) => p && !/^https?:\/\//.test(p));
+  for (const p of paths) if (/^https?:\/\//.test(p)) map.set(p, p);
+  if (internal.length === 0) return map;
+  const { data } = await db.storage.from("avatars").createSignedUrls(internal, 3600);
+  const base = process.env["SUPABASE_URL"] ?? "";
+  for (const row of data ?? []) {
+    if (row.path && row.signedUrl) {
+      map.set(row.path, row.signedUrl.startsWith("/") && base ? `${base}${row.signedUrl}` : row.signedUrl);
+    }
+  }
+  return map;
+}
+
 const memberRolesSchema = z.object({ user_id: z.string(), role_ids: z.array(z.string()) });
 const userIdSchema = z.object({ user_id: z.string() });
 const roleInputSchema = z.object({ name: z.string().min(1), description: z.string().optional() });
@@ -54,7 +71,24 @@ export const getMyProfile = createServerFn({ method: "GET" })
       .select("*")
       .eq("id", context.userId)
       .maybeSingle();
-    return (data as unknown as Profile | null) ?? null;
+    const profile = (data as unknown as Profile | null) ?? null;
+    if (!profile) return null;
+    if (profile.avatar_url) {
+      const signed = await signAvatars(context.supabase, [profile.avatar_url]);
+      return { ...profile, avatar_url: signed.get(profile.avatar_url) ?? profile.avatar_url };
+    }
+    return profile;
+  });
+
+export const setMyAvatar = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => avatarSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("profiles")
+      .update({ avatar_url: data.avatar_url })
+      .eq("id", context.userId);
+    if (error) throw new Error(error.message);
   });
 
 export const updateMyProfile = createServerFn({ method: "POST" })
@@ -95,12 +129,19 @@ export const getTeamData = createServerFn({ method: "GET" })
     const emails = new Map((authUsers.data?.users ?? []).map((u) => [u.id, u.email ?? ""]));
     const roleNames = new Map((rolesRes.data ?? []).map((r) => [r.id as string, r.name as string]));
 
-    const members: TeamMember[] = ((profilesRes.data ?? []) as unknown as Profile[]).map((p) => {
+    const profiles = (profilesRes.data ?? []) as unknown as Profile[];
+    const signedAvatars = await signAvatars(
+      supabaseAdmin as unknown as Db,
+      profiles.map((p) => p.avatar_url).filter((u): u is string => Boolean(u)),
+    );
+
+    const members: TeamMember[] = profiles.map((p) => {
       const roleIds = (userRolesRes.data ?? [])
         .filter((ur) => ur.user_id === p.id)
         .map((ur) => ur.role_id as string);
       return {
         ...p,
+        avatar_url: p.avatar_url ? (signedAvatars.get(p.avatar_url) ?? p.avatar_url) : null,
         email: emails.get(p.id) ?? undefined,
         role_ids: roleIds,
         role_names: roleIds.map((id) => roleNames.get(id) ?? "Unknown"),

@@ -17,8 +17,8 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedSubscriptionsRouteImport } from './routes/_authenticated/subscriptions'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedClientClientIdRouteImport } from './routes/_authenticated/client.$clientId'
 import { Route as AuthenticatedFeatureFeatureIdRouteImport } from './routes/_authenticated/feature.$featureId'
@@ -64,17 +64,16 @@ const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSubscriptionsRoute =
-  AuthenticatedSubscriptionsRouteImport.update({
-    id: '/subscriptions',
-    path: '/subscriptions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
   id: '/tickets',
   path: '/tickets',
@@ -107,8 +106,8 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -122,8 +121,8 @@ export interface FileRoutesByTo {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -139,8 +138,8 @@ export interface FileRoutesById {
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/subscriptions': typeof AuthenticatedSubscriptionsRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/client/$clientId': typeof AuthenticatedClientClientIdRoute
   '/_authenticated/feature/$featureId': typeof AuthenticatedFeatureFeatureIdRoute
@@ -156,8 +155,8 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/features'
+    | '/profile'
     | '/settings'
-    | '/subscriptions'
     | '/tickets'
     | '/client/$clientId'
     | '/feature/$featureId'
@@ -171,8 +170,8 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/features'
+    | '/profile'
     | '/settings'
-    | '/subscriptions'
     | '/tickets'
     | '/client/$clientId'
     | '/feature/$featureId'
@@ -187,8 +186,8 @@ export interface FileRouteTypes {
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
     | '/_authenticated/features'
+    | '/_authenticated/profile'
     | '/_authenticated/settings'
-    | '/_authenticated/subscriptions'
     | '/_authenticated/tickets'
     | '/_authenticated/client/$clientId'
     | '/_authenticated/feature/$featureId'
@@ -259,18 +258,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFeaturesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/subscriptions': {
-      id: '/_authenticated/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/subscriptions'
-      preLoaderRoute: typeof AuthenticatedSubscriptionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tickets': {
@@ -310,8 +309,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedSubscriptionsRoute: typeof AuthenticatedSubscriptionsRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedClientClientIdRoute: typeof AuthenticatedClientClientIdRoute
   AuthenticatedFeatureFeatureIdRoute: typeof AuthenticatedFeatureFeatureIdRoute
@@ -324,8 +323,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedSubscriptionsRoute: AuthenticatedSubscriptionsRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedClientClientIdRoute: AuthenticatedClientClientIdRoute,
   AuthenticatedFeatureFeatureIdRoute: AuthenticatedFeatureFeatureIdRoute,
@@ -343,3 +342,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

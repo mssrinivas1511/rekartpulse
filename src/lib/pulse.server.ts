@@ -569,17 +569,26 @@ export async function fetchAccountManagers(db: Db): Promise<AccountManagerWithSt
   const { data, error } = await db.from("account_managers").select("*").order("name");
   throwIf(error);
   const managers = (data ?? []) as unknown as AccountManager[];
-  const [clients, clientFeatures] = await Promise.all([fetchAllClients(db), fetchAllClientFeatures(db)]);
+  const [clients, clientFeatures, ticketsRes] = await Promise.all([
+    fetchAllClients(db),
+    fetchAllClientFeatures(db),
+    db.from("tickets").select("assigned_name, status"),
+  ]);
+  const tickets = (ticketsRes.data ?? []) as { assigned_name: string | null; status: string }[];
 
   const signed = await signPaths(
     db,
-    "client-logos",
+    "avatars",
     managers.map((m) => m.avatar_url).filter((u): u is string => Boolean(u)),
   );
 
   return managers.map((m) => {
     const mine = clients.filter((c) => c.account_manager_id === m.id && !c.archived_at);
     const myIds = new Set(mine.map((c) => c.id));
+    const myTickets = tickets.filter(
+      (t) => (t.assigned_name ?? "").trim().toLowerCase() === m.name.trim().toLowerCase(),
+    );
+    const resolved = myTickets.filter((t) => t.status === "resolved").length;
     return {
       ...m,
       avatar_url: m.avatar_url ? (signed.get(m.avatar_url) ?? m.avatar_url) : null,
@@ -587,9 +596,14 @@ export async function fetchAccountManagers(db: Db): Promise<AccountManagerWithSt
       active_clients: mine.filter((c) => c.status !== "churned").length,
       churned_clients: mine.filter((c) => c.status === "churned").length,
       features_adopted: clientFeatures.filter((cf) => cf.enabled && myIds.has(cf.client_id)).length,
+      tickets_assigned: myTickets.length,
+      tickets_resolved: resolved,
+      ticket_resolution_rate:
+        myTickets.length > 0 ? Math.round((resolved / myTickets.length) * 100) : 0,
     };
   });
 }
+
 
 export async function fetchSubscriptions(db: Db): Promise<Subscription[]> {
   const [subscriptions, clients] = await Promise.all([fetchAllSubscriptions(db), fetchAllClients(db)]);

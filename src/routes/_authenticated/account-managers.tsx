@@ -4,7 +4,6 @@ import { Plus, Trophy } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader } from "@/components/page-header";
 import { PermissionGate } from "@/components/permission-gate";
-import { ActivityFeed } from "@/components/activity-drawer";
 import { AccountManagerDialog } from "@/components/dialogs/account-manager-dialog";
 import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -87,8 +86,8 @@ function ManagersPage() {
         </div>
       )}
 
-      <div className="mx-6 grid gap-4 xl:grid-cols-3">
-        <section className="rounded-lg border border-border bg-card p-4 xl:col-span-2">
+      <div className="mx-6 grid gap-4">
+        <section className="rounded-lg border border-border bg-card p-4">
           <h2 className="text-sm font-semibold text-foreground">Tickets assigned vs resolved</h2>
           <div className="mt-3 h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -102,12 +101,6 @@ function ManagersPage() {
                 <Bar dataKey="Resolved" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </section>
-        <section className="rounded-lg border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold text-foreground">Recent changes</h2>
-          <div className="mt-3">
-            <ActivityFeed entityType="account_manager" limit={10} />
           </div>
         </section>
       </div>

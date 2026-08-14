@@ -274,25 +274,15 @@ function SidebarBody() {
   );
 }
 
-const SIDEBAR_KEY = "pulse:sidebar-open";
-
 export function AppShell({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isNavigating = useRouterState({ select: (s) => s.status === "pending" });
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(SIDEBAR_KEY);
-    if (stored !== null) setOpen(stored === "true");
-    else setOpen(window.innerWidth >= 1024);
-  }, []);
+    setMobileOpen(false);
+  }, [pathname]);
 
-  function toggle() {
-    setOpen((prev) => {
-      window.localStorage.setItem(SIDEBAR_KEY, String(!prev));
-      return !prev;
-    });
-  }
 
   const title =
     PAGE_TITLES[pathname] ??

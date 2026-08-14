@@ -274,25 +274,15 @@ function SidebarBody() {
   );
 }
 
-const SIDEBAR_KEY = "pulse:sidebar-open";
-
 export function AppShell({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isNavigating = useRouterState({ select: (s) => s.status === "pending" });
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(SIDEBAR_KEY);
-    if (stored !== null) setOpen(stored === "true");
-    else setOpen(window.innerWidth >= 1024);
-  }, []);
+    setMobileOpen(false);
+  }, [pathname]);
 
-  function toggle() {
-    setOpen((prev) => {
-      window.localStorage.setItem(SIDEBAR_KEY, String(!prev));
-      return !prev;
-    });
-  }
 
   const title =
     PAGE_TITLES[pathname] ??
@@ -308,28 +298,28 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-60 shadow-xl transition-transform duration-200 ease-out",
-          open ? "translate-x-0" : "-translate-x-full",
+          "fixed inset-y-0 left-0 z-50 w-60 shadow-xl transition-transform duration-200 ease-out lg:translate-x-0",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <SidebarBody />
       </aside>
 
-      {open && (
+      {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          onClick={toggle}
+          onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <div className={cn("transition-[padding] duration-200", open && "lg:pl-60")}>
+      <div className="lg:pl-60">
         <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-card/95 px-4 py-2.5 backdrop-blur">
           <button
-            onClick={toggle}
-            className="rounded-md border border-border p-1.5 text-foreground transition-colors hover:bg-accent"
-            aria-label={open ? "Collapse menu" : "Open menu"}
-            aria-expanded={open}
+            onClick={() => setMobileOpen((v) => !v)}
+            className="rounded-md border border-border p-1.5 text-foreground transition-colors hover:bg-accent lg:hidden"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
           >
             <PanelLeft className="size-4" />
           </button>
@@ -338,10 +328,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="size-3.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           )}
           <div className="ml-auto flex items-center gap-2">
-            <ActivityDrawer />
+            {pathname !== "/activity" && <ActivityDrawer />}
             <NotificationBell />
           </div>
         </header>
+
 
         <main className="min-h-[calc(100vh-49px)]">{children}</main>
       </div>

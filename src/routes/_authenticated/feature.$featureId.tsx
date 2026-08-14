@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeatureDialog } from "@/components/dialogs/feature-dialog";
@@ -55,6 +55,7 @@ function FeatureDetailPage() {
   }
 
   return <div className="space-y-5 p-6">
+    <Link to="/features" className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"><ArrowLeft className="size-3.5" /> Back to features</Link>
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div><div className="flex items-center gap-2"><h1 className="text-xl font-bold">{f.name}</h1><StatusBadge status={f.status} /></div><p className="mt-1 text-sm text-muted-foreground">{f.category} · {f.release_version ?? "No release version"}</p></div>
       <div className="flex gap-2">

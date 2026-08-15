@@ -3,13 +3,7 @@ import { ShieldAlert } from "lucide-react";
 import { usePermissions } from "@/hooks/use-permissions";
 import type { Section } from "@/lib/types";
 
-export function PermissionGate({
-  section,
-  children,
-}: {
-  section: Section;
-  children: ReactNode;
-}) {
+export function PermissionGate({ section, children }: { section: Section; children: ReactNode }) {
   const { can, isAdmin, loaded } = usePermissions();
 
   if (!loaded) {

@@ -1,6 +1,6 @@
 # Rekart Pulse
 
-answers for your questions : 
+answers for your questions :
 
 1. Yes, Clients who enabled this features on their account, their customers are using this features, clients who were not enabled features on their account, their customers cant use this
 
@@ -12,7 +12,7 @@ answers for your questions :
 
 5. Whatsapp AI Assistant and Few times Operational
 
-6. Iteration and bringing something new. 
+6. Iteration and bringing something new.
 
 Here i am attaching photo of it, please make it as per that. it should be operational for my daily use, so as to i keep on updating things and based on that you need to give me real data and output.
 

@@ -204,10 +204,14 @@ function TicketPage() {
             <h2 className="text-sm font-semibold">Description</h2>
             {editing ? (
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => {
-                  setDescription(t.description ?? "");
-                  setEditing(false);
-                }}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setDescription(t.description ?? "");
+                    setEditing(false);
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button size="sm" disabled={saving} onClick={() => void saveDescription()}>

@@ -34,7 +34,10 @@ async function signAvatars(db: Db, paths: string[]): Promise<Map<string, string>
   const base = process.env["SUPABASE_URL"] ?? "";
   for (const row of data ?? []) {
     if (row.path && row.signedUrl) {
-      map.set(row.path, row.signedUrl.startsWith("/") && base ? `${base}${row.signedUrl}` : row.signedUrl);
+      map.set(
+        row.path,
+        row.signedUrl.startsWith("/") && base ? `${base}${row.signedUrl}` : row.signedUrl,
+      );
     }
   }
   return map;

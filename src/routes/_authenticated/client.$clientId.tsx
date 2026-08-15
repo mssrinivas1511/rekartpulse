@@ -23,6 +23,19 @@ import {
 import type { ClientDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+function ClientNotFound() {
+  const { clientId } = Route.useParams();
+  return (
+    <div className="p-10 text-center">
+      <h1 className="text-lg font-semibold text-foreground">Client not found</h1>
+      <p className="mt-1 text-sm text-muted-foreground">No client with id {clientId}.</p>
+      <Link to="/clients" className="mt-4 inline-block text-sm font-medium text-primary">
+        Back to clients
+      </Link>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_authenticated/client/$clientId")({
   head: () => ({
     meta: [{ title: "Client — Rekart Pulse" }],
@@ -36,18 +49,7 @@ export const Route = createFileRoute("/_authenticated/client/$clientId")({
     return detail;
   },
   component: ClientDetailPage,
-  notFoundComponent: () => {
-    const { clientId } = Route.useParams();
-    return (
-      <div className="p-10 text-center">
-        <h1 className="text-lg font-semibold text-foreground">Client not found</h1>
-        <p className="mt-1 text-sm text-muted-foreground">No client with id {clientId}.</p>
-        <Link to="/clients" className="mt-4 inline-block text-sm font-medium text-primary">
-          Back to clients
-        </Link>
-      </div>
-    );
-  },
+  notFoundComponent: ClientNotFound,
 });
 
 const TABS = ["Overview", "Features", "Subscriptions", "Tickets", "Activity"] as const;
@@ -194,7 +196,10 @@ function OverviewTab({ detail }: { detail: ClientDetail }) {
             label="Monthly Revenue"
             value={`₹${client.monthly_revenue.toLocaleString("en-IN")}`}
           />
-          <InfoItem label="Client Since" value={format(new Date(client.client_since), "d MMM yyyy")} />
+          <InfoItem
+            label="Client Since"
+            value={format(new Date(client.client_since), "d MMM yyyy")}
+          />
           <InfoItem label="Onboarded" value={format(new Date(client.onboarded_at), "d MMM yyyy")} />
         </div>
       </div>
@@ -288,7 +293,9 @@ function FeaturesTab({ detail, clientId }: { detail: ClientDetail; clientId: str
                         onTouchEnd={(e) => void save(f.id, true, Number(e.currentTarget.value))}
                         className="w-28 accent-[var(--primary)]"
                       />
-                      <span className="text-xs tabular-nums text-muted-foreground">{adoption}%</span>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {adoption}%
+                      </span>
                     </div>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>

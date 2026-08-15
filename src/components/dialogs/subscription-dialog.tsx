@@ -108,7 +108,11 @@ function SubscriptionForm({
       )}
       <div className="grid grid-cols-2 gap-4">
         <Field label="Product">
-          <select className={selectCls} value={product} onChange={(e) => setProduct(e.target.value)}>
+          <select
+            className={selectCls}
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+          >
             {SUBSCRIPTION_PRODUCTS.map((p) => (
               <option key={p} value={p}>
                 {p}

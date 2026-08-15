@@ -17,7 +17,10 @@ export const Route = createFileRoute("/_authenticated/profile")({
       { title: "My Profile — Rekart Pulse" },
       { name: "description", content: "Update your Rekart Pulse profile details and photo." },
       { property: "og:title", content: "My Profile — Rekart Pulse" },
-      { property: "og:description", content: "Update your Rekart Pulse profile details and photo." },
+      {
+        property: "og:description",
+        content: "Update your Rekart Pulse profile details and photo.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -134,7 +137,11 @@ function ProfilePage() {
               />
             </Field>
             <Field label="Phone">
-              <input className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <input
+                className={inputCls}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
             </Field>
             <Field label="Country">
               <select

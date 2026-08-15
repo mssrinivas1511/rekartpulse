@@ -91,7 +91,11 @@ export function FeatureDialog({ feature, trigger }: { feature?: Feature; trigger
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Category">
-              <select className={selectCls} value={category} onChange={(e) => setCategory(e.target.value)}>
+              <select
+                className={selectCls}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
                 {FEATURE_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
                     {c}

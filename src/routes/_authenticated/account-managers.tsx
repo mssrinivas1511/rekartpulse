@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus, Trophy } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { PageHeader } from "@/components/page-header";
 import { PermissionGate } from "@/components/permission-gate";
 import { AccountManagerDialog } from "@/components/dialogs/account-manager-dialog";
@@ -17,9 +26,15 @@ export const Route = createFileRoute("/_authenticated/account-managers")({
   head: () => ({
     meta: [
       { title: "Account Managers — Rekart Pulse" },
-      { name: "description", content: "Account manager ownership and ticket resolution performance." },
+      {
+        name: "description",
+        content: "Account manager ownership and ticket resolution performance.",
+      },
       { property: "og:title", content: "Account Managers — Rekart Pulse" },
-      { property: "og:description", content: "Account manager ownership and ticket resolution performance." },
+      {
+        property: "og:description",
+        content: "Account manager ownership and ticket resolution performance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,7 +69,9 @@ function ManagersPage() {
   const champion = [...data]
     .filter((m) => m.tickets_assigned > 0)
     .sort(
-      (a, b) => b.ticket_resolution_rate - a.ticket_resolution_rate || b.tickets_resolved - a.tickets_resolved,
+      (a, b) =>
+        b.ticket_resolution_rate - a.ticket_resolution_rate ||
+        b.tickets_resolved - a.tickets_resolved,
     )[0];
 
   return (

@@ -131,7 +131,11 @@ export function ClientDialog({ client, trigger }: { client?: Client; trigger: Re
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Phone">
-              <input className={inputCls} value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <input
+                className={inputCls}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
             </Field>
             <Field label="City">
               <input className={inputCls} value={city} onChange={(e) => setCity(e.target.value)} />
@@ -139,7 +143,11 @@ export function ClientDialog({ client, trigger }: { client?: Client; trigger: Re
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Country">
-              <select className={selectCls} value={country} onChange={(e) => pickCountry(e.target.value)}>
+              <select
+                className={selectCls}
+                value={country}
+                onChange={(e) => pickCountry(e.target.value)}
+              >
                 {COUNTRIES.map((c) => (
                   <option key={c.country} value={c.country}>
                     {c.country}
@@ -148,7 +156,11 @@ export function ClientDialog({ client, trigger }: { client?: Client; trigger: Re
               </select>
             </Field>
             <Field label="Currency">
-              <select className={selectCls} value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              <select
+                className={selectCls}
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              >
                 {CURRENCIES.map((c) => (
                   <option key={c} value={c}>
                     {c}

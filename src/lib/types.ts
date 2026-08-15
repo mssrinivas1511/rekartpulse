@@ -9,12 +9,7 @@ export type NoteType = "product_input" | "iteration" | "next_release";
 export type MediaType = "image" | "gif" | "video";
 
 export type Section =
-  | "dashboard"
-  | "clients"
-  | "features"
-  | "tickets"
-  | "account_managers"
-  | "settings";
+  "dashboard" | "clients" | "features" | "tickets" | "account_managers" | "settings";
 export type PermAction = "view" | "create" | "edit" | "delete";
 
 export const SECTIONS: Section[] = [
@@ -208,7 +203,6 @@ export interface AccountManagerWithStats extends AccountManager {
   tickets_resolved: number;
   ticket_resolution_rate: number;
 }
-
 
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 

@@ -77,9 +77,7 @@ export function NotificationBell() {
             </Link>
           ))}
           {tickets.length === 0 && (
-            <p className="px-3 py-6 text-center text-xs text-muted-foreground">
-              No tickets yet.
-            </p>
+            <p className="px-3 py-6 text-center text-xs text-muted-foreground">No tickets yet.</p>
           )}
         </div>
       </PopoverContent>

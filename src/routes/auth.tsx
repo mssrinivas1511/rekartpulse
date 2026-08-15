@@ -19,7 +19,11 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Rekart Pulse" },
-      { name: "description", content: "Sign in to Rekart Pulse, the internal client success and feature adoption dashboard." },
+      {
+        name: "description",
+        content:
+          "Sign in to Rekart Pulse, the internal client success and feature adoption dashboard.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),

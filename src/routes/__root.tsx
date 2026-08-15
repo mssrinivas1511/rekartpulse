@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -93,9 +94,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Rekart Pulse — Client Success & Feature Adoption" },
-      { name: "twitter:description", content: "Internal dashboard for the Rekart team to track feature adoption, client health, feedback, tickets, and product usage." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94d142a521d1e7fb58fa7a75227598fe/id-preview-73bff5ec--843db036-5865-491b-8993-ba29ba4e0924.lovable.app-1786668474466.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94d142a521d1e7fb58fa7a75227598fe/id-preview-73bff5ec--843db036-5865-491b-8993-ba29ba4e0924.lovable.app-1786668474466.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Internal dashboard for the Rekart team to track feature adoption, client health, feedback, tickets, and product usage.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94d142a521d1e7fb58fa7a75227598fe/id-preview-73bff5ec--843db036-5865-491b-8993-ba29ba4e0924.lovable.app-1786668474466.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/94d142a521d1e7fb58fa7a75227598fe/id-preview-73bff5ec--843db036-5865-491b-8993-ba29ba4e0924.lovable.app-1786668474466.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -123,6 +136,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <Analytics />
         <Scripts />
       </body>
     </html>

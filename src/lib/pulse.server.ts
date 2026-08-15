@@ -328,7 +328,8 @@ export async function fetchDashboard(db: Db): Promise<DashboardData> {
       : 0;
 
   const feedbackCounts = new Map<string, number>();
-  for (const f of feedback) feedbackCounts.set(f.feature_id, (feedbackCounts.get(f.feature_id) ?? 0) + 1);
+  for (const f of feedback)
+    feedbackCounts.set(f.feature_id, (feedbackCounts.get(f.feature_id) ?? 0) + 1);
 
   const featureStats = computeFeatureStats(features, clientFeatures, clients, feedbackCounts);
   const liveStats = featureStats.filter((f) => f.status === "live");
@@ -337,7 +338,9 @@ export async function fetchDashboard(db: Db): Promise<DashboardData> {
       ? Math.round(liveStats.reduce((sum, f) => sum + f.adoption_rate, 0) / liveStats.length)
       : 0;
   const clientsUsing = new Set(
-    clientFeatures.filter((cf) => cf.enabled && Number(cf.adoption_percent) > 0).map((cf) => cf.client_id),
+    clientFeatures
+      .filter((cf) => cf.enabled && Number(cf.adoption_percent) > 0)
+      .map((cf) => cf.client_id),
   ).size;
 
   const months: { key: string; month: string; count: number }[] = [];
@@ -414,7 +417,9 @@ export async function fetchClients(db: Db, search?: string): Promise<ClientWithM
     ...c,
     logo_url: c.logo_url ? (signed.get(c.logo_url) ?? c.logo_url) : null,
     features_enabled: counts.get(c.id) ?? 0,
-    account_manager_name: c.account_manager_id ? (managerNames.get(c.account_manager_id) ?? null) : null,
+    account_manager_name: c.account_manager_id
+      ? (managerNames.get(c.account_manager_id) ?? null)
+      : null,
   }));
 }
 
@@ -423,11 +428,21 @@ export async function fetchClientDetail(db: Db, id: string): Promise<ClientDetai
   if (error || !client) throw new Error("Client not found");
 
   const [subsRes, features, cfRes, ticketsRes, auditRes] = await Promise.all([
-    db.from("subscriptions").select("*").eq("client_id", id).order("created_at", { ascending: false }),
+    db
+      .from("subscriptions")
+      .select("*")
+      .eq("client_id", id)
+      .order("created_at", { ascending: false }),
     fetchAllFeatures(db),
     db.from("client_features").select("*").eq("client_id", id),
     db.from("tickets").select("*").eq("client_id", id).order("created_at", { ascending: false }),
-    db.from("audit_logs").select("*").eq("entity_type", "client").eq("entity_id", id).order("created_at", { ascending: false }).limit(50),
+    db
+      .from("audit_logs")
+      .select("*")
+      .eq("entity_type", "client")
+      .eq("entity_id", id)
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
   throwIf(subsRes.error);
   throwIf(cfRes.error);
@@ -479,11 +494,25 @@ export async function fetchFeatureDetail(db: Db, id: string): Promise<FeatureDet
 
   const [mediaRes, feedbackRes, notesRes, cfRes, clients, auditRes] = await Promise.all([
     db.from("feature_media").select("*").eq("feature_id", id).order("sort_order"),
-    db.from("feature_feedback").select("*").eq("feature_id", id).order("created_at", { ascending: false }),
-    db.from("feature_notes").select("*").eq("feature_id", id).order("created_at", { ascending: false }),
+    db
+      .from("feature_feedback")
+      .select("*")
+      .eq("feature_id", id)
+      .order("created_at", { ascending: false }),
+    db
+      .from("feature_notes")
+      .select("*")
+      .eq("feature_id", id)
+      .order("created_at", { ascending: false }),
     db.from("client_features").select("*").eq("feature_id", id),
     fetchAllClients(db),
-    db.from("audit_logs").select("*").eq("entity_type", "feature").eq("entity_id", id).order("created_at", { ascending: false }).limit(50),
+    db
+      .from("audit_logs")
+      .select("*")
+      .eq("entity_type", "feature")
+      .eq("entity_id", id)
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
   throwIf(mediaRes.error);
   throwIf(feedbackRes.error);
@@ -492,7 +521,11 @@ export async function fetchFeatureDetail(db: Db, id: string): Promise<FeatureDet
   throwIf(auditRes.error);
 
   const media = (mediaRes.data ?? []) as unknown as FeatureMedia[];
-  const signed = await signPaths(db, "feature-media", media.map((m) => m.url));
+  const signed = await signPaths(
+    db,
+    "feature-media",
+    media.map((m) => m.url),
+  );
   const clientMap = new Map(clients.map((c) => [c.id, c]));
 
   return {
@@ -556,7 +589,11 @@ export async function fetchTicketDetail(
     : null;
 
   const attachments = (attachmentsRes.data ?? []) as unknown as TicketAttachment[];
-  const signed = await signPaths(db, "ticket-attachments", attachments.map((a) => a.url));
+  const signed = await signPaths(
+    db,
+    "ticket-attachments",
+    attachments.map((a) => a.url),
+  );
 
   return {
     ticket: typed,
@@ -604,14 +641,23 @@ export async function fetchAccountManagers(db: Db): Promise<AccountManagerWithSt
   });
 }
 
-
 export async function fetchSubscriptions(db: Db): Promise<Subscription[]> {
-  const [subscriptions, clients] = await Promise.all([fetchAllSubscriptions(db), fetchAllClients(db)]);
+  const [subscriptions, clients] = await Promise.all([
+    fetchAllSubscriptions(db),
+    fetchAllClients(db),
+  ]);
   const clientNames = new Map(clients.map((c) => [c.id, c.name]));
-  return subscriptions.map((s) => ({ ...s, client_name: clientNames.get(s.client_id) ?? "Unknown client" }));
+  return subscriptions.map((s) => ({
+    ...s,
+    client_name: clientNames.get(s.client_id) ?? "Unknown client",
+  }));
 }
 
-export async function fetchAuditLogs(db: Db, entityType?: string, entityId?: string): Promise<AuditLog[]> {
+export async function fetchAuditLogs(
+  db: Db,
+  entityType?: string,
+  entityId?: string,
+): Promise<AuditLog[]> {
   let query = db
     .from("audit_logs")
     .select("*")
@@ -718,7 +764,10 @@ export async function updateClient(
     entity_type: "client",
     entity_id: id,
     entity_label: input.name,
-    action: before && before.status !== input.status ? `Status changed: ${before.status} → ${input.status}` : "Updated",
+    action:
+      before && before.status !== input.status
+        ? `Status changed: ${before.status} → ${input.status}`
+        : "Updated",
     before: before as unknown as Json,
     after: input as unknown as Json,
   });
@@ -878,7 +927,11 @@ export async function insertSubscription(
     .select("id")
     .single();
   throwIf(error);
-  const { data: client } = await db.from("clients").select("name").eq("id", input.client_id).single();
+  const { data: client } = await db
+    .from("clients")
+    .select("name")
+    .eq("id", input.client_id)
+    .single();
   await audit(db, userId, {
     entity_type: "client",
     entity_id: input.client_id,
@@ -1035,7 +1088,11 @@ export async function updateFeedback(
   input: z.infer<typeof updateFeedbackSchema>,
 ): Promise<void> {
   await requirePermission(db, userId, "features", "edit");
-  const { data: before } = await db.from("feature_feedback").select("*").eq("id", input.id).single();
+  const { data: before } = await db
+    .from("feature_feedback")
+    .select("*")
+    .eq("id", input.id)
+    .single();
   const { id, ...fields } = input;
   const { error } = await db
     .from("feature_feedback")
@@ -1190,7 +1247,11 @@ export async function updateTicketStatus(
   input: z.infer<typeof ticketStatusSchema>,
 ): Promise<void> {
   await requirePermission(db, userId, "tickets", "edit");
-  const { data: before } = await db.from("tickets").select("status, title").eq("id", input.id).single();
+  const { data: before } = await db
+    .from("tickets")
+    .select("status, title")
+    .eq("id", input.id)
+    .single();
   const { error } = await db.from("tickets").update({ status: input.status }).eq("id", input.id);
   throwIf(error);
   await audit(db, userId, {
@@ -1312,7 +1373,11 @@ export async function updateAccountManager(
   input: z.infer<typeof updateAccountManagerSchema>,
 ): Promise<void> {
   await requirePermission(db, userId, "account_managers", "edit");
-  const { data: before } = await db.from("account_managers").select("*").eq("id", input.id).single();
+  const { data: before } = await db
+    .from("account_managers")
+    .select("*")
+    .eq("id", input.id)
+    .single();
   const { id, ...fields } = input;
   const { error } = await db
     .from("account_managers")

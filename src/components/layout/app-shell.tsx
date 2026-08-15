@@ -46,10 +46,33 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, section: "dashboard" },
-  { to: "/clients", label: "Clients", icon: Users, section: "clients", extraPrefixes: ["/client/"] },
-  { to: "/features", label: "Features", icon: Puzzle, section: "features", extraPrefixes: ["/feature/"] },
-  { to: "/tickets", label: "Tickets", icon: TicketCheck, section: "tickets", extraPrefixes: ["/ticket/"] },
-  { to: "/account-managers", label: "Account Managers", icon: UserCog, section: "account_managers" },
+  {
+    to: "/clients",
+    label: "Clients",
+    icon: Users,
+    section: "clients",
+    extraPrefixes: ["/client/"],
+  },
+  {
+    to: "/features",
+    label: "Features",
+    icon: Puzzle,
+    section: "features",
+    extraPrefixes: ["/feature/"],
+  },
+  {
+    to: "/tickets",
+    label: "Tickets",
+    icon: TicketCheck,
+    section: "tickets",
+    extraPrefixes: ["/ticket/"],
+  },
+  {
+    to: "/account-managers",
+    label: "Account Managers",
+    icon: UserCog,
+    section: "account_managers",
+  },
   { to: "/activity", label: "Activity Log", icon: ScrollText, section: null },
   { to: "/settings", label: "Settings", icon: Settings, section: "settings" },
 ];
@@ -283,7 +306,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     setMobileOpen(false);
   }, [pathname]);
 
-
   const title =
     PAGE_TITLES[pathname] ??
     (pathname.startsWith("/client/")
@@ -332,7 +354,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NotificationBell />
           </div>
         </header>
-
 
         <main className="min-h-[calc(100vh-49px)]">{children}</main>
       </div>

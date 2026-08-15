@@ -45,7 +45,8 @@ export function ActivityFeed({
           <span className="absolute -left-[21px] top-4 size-2 rounded-full bg-primary" />
           <p className="text-sm font-medium leading-snug text-foreground">{log.action}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {log.entity_label ?? log.entity_type} · {log.user_name} · {formatDateTime(log.created_at)}
+            {log.entity_label ?? log.entity_type} · {log.user_name} ·{" "}
+            {formatDateTime(log.created_at)}
           </p>
         </li>
       ))}

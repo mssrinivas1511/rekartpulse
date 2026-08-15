@@ -108,7 +108,9 @@ export const getAccountManagers = createServerFn({ method: "GET" })
 export const getAuditLogs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => auditFilterSchema.parse(data ?? {}))
-  .handler(({ data, context }) => fetchAuditLogs(context.supabase, data.entity_type, data.entity_id));
+  .handler(({ data, context }) =>
+    fetchAuditLogs(context.supabase, data.entity_type, data.entity_id),
+  );
 
 export const getSubscriptions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

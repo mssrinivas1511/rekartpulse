@@ -122,8 +122,8 @@ function DashboardPage() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-foreground">{f.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {f.clients_using}/{f.clients_enabled} clients · {f.customers_reached} customers ·{" "}
-                    {f.avg_adoption}%
+                    {f.clients_using}/{f.clients_enabled} clients · {f.customers_reached} customers
+                    · {f.avg_adoption}%
                   </span>
                 </div>
                 <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
